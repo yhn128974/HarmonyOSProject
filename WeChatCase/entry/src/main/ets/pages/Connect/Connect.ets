@@ -1,10 +1,13 @@
-import { promptAction } from '@kit.ArkUI'
+import { promptAction, router } from '@kit.ArkUI'
 import { UserInfoModel } from '../../models/user'
 import { WeChatStore } from '../../utils/chat_store'
 
 @Component
 export struct Connect {
   @State userList: UserInfoModel[] = []
+  @State filterList: UserInfoModel[] = []
+  @Watch('updateFilterList')
+  @State searchName: string = ''
 
   aboutToAppear(): void {
     this.getUserList()
@@ -13,15 +16,25 @@ export struct Connect {
     })
   }
 
+  updateFilterList() {
+    if (this.searchName) {
+      this.filterList = this.userList.filter(item => item.username.includes(this.searchName))
+      return
+    }
+    this.filterList = this.userList
+  }
+
   getUserList() {
     this.userList = WeChatStore.getWeChatConnect()
+    this.updateFilterList()
   }
 
   build() {
     Column() {
       Row() {
         Search({
-          placeholder: '搜索'
+          placeholder: '搜索',
+          value: $$this.searchName
         }).height(30).borderRadius(4).padding({
           left: 10,
           right: 10
@@ -48,6 +61,8 @@ export struct Connect {
             normal: {
               .backgroundColor($r('app.color.white'))
             }
+          }).onClick(() => {
+            router.pushUrl({ url: 'pages/ChatDetail/ChatDetail' })
           })
         })
       }.backgroundColor($r('app.color.white'))
