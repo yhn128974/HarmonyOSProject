@@ -1,4 +1,6 @@
 import { TabBarClass } from '../models/tab'
+import { UserInfo, UserInfoModel, DefaultUserList } from '../models/user'
+import { Connect } from './Connect/Connect'
 
 @Entry
 @Component
@@ -44,7 +46,15 @@ struct Index {
     Tabs({ index: $$this.currentIndex }) {
       ForEach(this.tabList, (item: TabBarClass) => {
         TabContent() {
-          Text(item.title)
+          if (item.name == 'wechat') {
+            Text('微信')
+          } else if (item.name == 'connect') {
+            Connect()
+          } else if (item.name == 'discover') {
+
+          } else {
+
+          }
         }.tabBar(this.CommonTabBar(item))
       })
     }.barPosition(BarPosition.End).animationDuration(100)
