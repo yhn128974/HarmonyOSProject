@@ -11,17 +11,17 @@ export struct Connect {
 
   aboutToAppear(): void {
     this.getUserList()
-    promptAction.showToast({
-      message: '联系人即将渲染'
-    })
+
   }
 
   updateFilterList() {
+
     if (this.searchName) {
       this.filterList = this.userList.filter(item => item.username.includes(this.searchName))
-      return
+    }else{
+      this.filterList = this.userList
     }
-    this.filterList = this.userList
+
   }
 
   getUserList() {
@@ -42,7 +42,7 @@ export struct Connect {
       }.width('100%')
 
       List() {
-        ForEach(this.userList, (item: UserInfoModel) => {
+        ForEach(this.filterList, (item: UserInfoModel) => {
           ListItem() {
             Row({
               space: 10
@@ -62,7 +62,8 @@ export struct Connect {
               .backgroundColor($r('app.color.white'))
             }
           }).onClick(() => {
-            router.pushUrl({ url: 'pages/ChatDetail/ChatDetail' })
+            router.pushUrl({ url: 'pages/ChatDetail/ChatDetail',params:item })
+
           })
         })
       }.backgroundColor($r('app.color.white'))

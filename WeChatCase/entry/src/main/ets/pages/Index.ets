@@ -51,7 +51,9 @@ struct Index {
           } else if (item.name == 'connect') {
             Connect()
           } else if (item.name == 'discover') {
-
+            TextInput({
+              placeholder:'请输入内容'
+            })
           } else {
 
           }
