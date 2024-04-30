@@ -1,3 +1,5 @@
+import { promptAction } from '@kit.ArkUI'
+
 @Preview
 @Component
 struct BottomInput {
@@ -26,6 +28,7 @@ struct BottomInput {
             left: 10,
             right: 10
           })
+
       } else {
         TextInput({
           text: $$this.content
@@ -33,7 +36,7 @@ struct BottomInput {
           .onSubmit(() => {
             if (this.content) {
               this.sentTextMessage(this.content)
-              this.content=''
+              this.content = ''
             }
           })
           .layoutWeight(1)
@@ -44,10 +47,7 @@ struct BottomInput {
             left: 10,
             right: 10
           })
-
       }
-
-
       Image($r('app.media.ic_public_add_norm')).width(25).aspectRatio(1)
 
     }.width('100%').padding({

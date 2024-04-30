@@ -1,6 +1,7 @@
 import { TabBarClass } from '../models/tab'
 import { UserInfo, UserInfoModel, DefaultUserList } from '../models/user'
 import { Connect } from './Connect/Connect'
+import WeChat from './WeChat/WeChat'
 
 @Entry
 @Component
@@ -47,12 +48,12 @@ struct Index {
       ForEach(this.tabList, (item: TabBarClass) => {
         TabContent() {
           if (item.name == 'wechat') {
-            Text('微信')
+            WeChat()
           } else if (item.name == 'connect') {
             Connect()
           } else if (item.name == 'discover') {
             TextInput({
-              placeholder:'请输入内容'
+              placeholder: '请输入内容'
             })
           } else {
 

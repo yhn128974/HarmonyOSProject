@@ -11,21 +11,18 @@ export struct Connect {
 
   aboutToAppear(): void {
     this.getUserList()
-
   }
 
   updateFilterList() {
-
     if (this.searchName) {
       this.filterList = this.userList.filter(item => item.username.includes(this.searchName))
-    }else{
+    } else {
       this.filterList = this.userList
     }
-
   }
 
-  getUserList() {
-    this.userList = WeChatStore.getWeChatConnect()
+  async getUserList() {
+    this.userList = await WeChatStore.getWeChatConnect()
     this.updateFilterList()
   }
 
@@ -62,7 +59,7 @@ export struct Connect {
               .backgroundColor($r('app.color.white'))
             }
           }).onClick(() => {
-            router.pushUrl({ url: 'pages/ChatDetail/ChatDetail',params:item })
+            router.pushUrl({ url: 'pages/ChatDetail/ChatDetail', params: item })
 
           })
         })
