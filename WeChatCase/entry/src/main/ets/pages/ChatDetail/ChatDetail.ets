@@ -73,6 +73,22 @@ struct ChatDetail {
     this.scroller.scrollEdge(Edge.Bottom)
   }
 
+  // 删除信息的方法
+  delMessage(messId: string) {
+    if (messId) {
+      // 先移除当前组件的数据
+      const index = this.messageList.findIndex(item => item.id === messId)
+      if (index > -1) {
+        this.messageList.splice(index, 1)
+      }
+
+
+      // 再移除首选项的数据
+      WeChatStore.delOneWeChatMessage(this.talkUser.user_id, messId)
+    }
+  }
+
+
   build() {
     Column() {
       // Header
@@ -96,7 +112,10 @@ struct ChatDetail {
           ForEach(this.messageList, (item: MessageInfoModel) => {
             ListItem() {
               Message({
-                currentMessage: item
+                currentMessage: item,
+                delMessage: (messId: string) => {
+                  this.delMessage(messId)
+                }
               })
             }
           })

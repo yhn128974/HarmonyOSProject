@@ -3,9 +3,18 @@ import { UserInfo, UserInfoModel, DefaultUserList } from '../models/user'
 import { Connect } from './Connect/Connect'
 import WeChat from './WeChat/WeChat'
 
+class person {
+  name: string = '234'
+  age: number = 20
+}
+
 @Entry
 @Component
 struct Index {
+  aboutToAppear(): void {
+
+  }
+
   @State tabList: TabBarClass[] = [
     {
       icon: $r('app.media.ic_public_message'),

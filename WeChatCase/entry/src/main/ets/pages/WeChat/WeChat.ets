@@ -29,6 +29,31 @@ export default struct WeChat {
     }
   }
 
+  @Builder
+  ListEndBuilder(user_id: string) {
+    Row() {
+      Text("删除")
+        .fontColor($r('app.color.white'))
+        .width(100)
+        .textAlign(TextAlign.Center)
+    }
+    .height(70)
+    .padding({
+      left: 20,
+      right: 20
+    })
+    .backgroundColor($r('app.color.danger'))
+    .onClick(() => {
+      if (user_id) {
+        let index: number = this.list.findIndex(item => item.connectUser.user_id == user_id)
+        if (index > -1) {
+          this.list.splice(index, 1)
+          WeChatStore.delWeChatMessage(user_id)
+        }
+      }
+    })
+  }
+
   build() {
     Column() {
       Row() {
@@ -73,6 +98,11 @@ export default struct WeChat {
               url: 'pages/ChatDetail/ChatDetail',
               params: item.connectUser
             })
+          })
+          .swipeAction({
+            end: {
+              builder: this.ListEndBuilder(item.connectUser.user_id)
+            }
           })
         })
       }

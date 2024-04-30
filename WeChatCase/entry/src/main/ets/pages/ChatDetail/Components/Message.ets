@@ -16,32 +16,36 @@ export struct Message {
   @State showPopup: boolean = false
   // 弹框数据
   @State
-  popupList: PopupItem[] = [{
-    title: '听筒播放',
-    icon: $r("app.media.ic_public_ears")
-  },
+  popupList: PopupItem[] = [
+    {
+      title: '听筒播放',
+      icon: $r("app.media.ic_public_ears")
+    },
     {
       title: '收藏',
       icon: $r("app.media.ic_public_cube")
     }, {
-      title: '转文字',
-      icon: $r("app.media.ic_public_trans_text")
-    }, {
-      title: '删除',
-      icon: $r("app.media.ic_public_cancel"),
-      itemClick: () => {
-
-      }
-    }, {
-      title: '多选',
-      icon: $r("app.media.ic_public_multi_select")
-    }, {
-      title: '引用',
-      icon: $r("app.media.ic_public_link")
-    }, {
-      title: '提醒',
-      icon: $r("app.media.ic_public_warin")
-    }]
+    title: '转文字',
+    icon: $r("app.media.ic_public_trans_text")
+  }, {
+    title: '删除',
+    icon: $r("app.media.ic_public_cancel"),
+    itemClick: () => {
+      this.delMessage(this.currentMessage.id)
+    }
+  }, {
+    title: '多选',
+    icon: $r("app.media.ic_public_multi_select")
+  }, {
+    title: '引用',
+    icon: $r("app.media.ic_public_link")
+  }, {
+    title: '提醒',
+    icon: $r("app.media.ic_public_warin")
+  }]
+  // 删除信息的方法
+  delMessage: (messId: string) => void = () => {
+  }
 
   @Builder
   getContent() {
