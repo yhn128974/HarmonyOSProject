@@ -68,8 +68,10 @@ export class WeChatStore {
 
   // 获取所有人的聊天记录的最后一条
   static async getAllLastRecord() {
+
     const users = await WeChatStore.getWeChatConnect()
     let list: MessageInfoModel[] = []
+
     users.forEach(user => {
       const messList = WeChatStore.getWeChatMessage(user.user_id)
       if (messList && messList.length) {

@@ -16,7 +16,16 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET"
+      },
+      {
+        "name": "ohos.permission.MICROPHONE",
+        "reason": "$string:Microphone_reason",
+        "usedScene": {
+          "when": "always",
+          "abilities": ['EntryAbility']
+        }
       }
+
     ],
     "abilities": [
       {

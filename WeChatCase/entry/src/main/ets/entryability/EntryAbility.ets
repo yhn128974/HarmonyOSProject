@@ -1,4 +1,4 @@
-import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { abilityAccessCtrl, AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
 import { WeChatStore } from '../utils/chat_store';
@@ -8,6 +8,10 @@ import { UserInfo, UserInfoModel } from '../models/user';
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
+    const manger=abilityAccessCtrl.createAtManager()//得到管理对象
+    // 第一道防线.申请权限，无论过还是不过
+    manger.requestPermissionsFromUser(this.context,["ohos.permission.MICROPHONE"])
+
   }
 
   onDestroy(): void {
@@ -42,6 +46,7 @@ export default class EntryAbility extends UIAbility {
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+
   }
 
   onForeground(): void {
