@@ -21,7 +21,7 @@ struct VoiceInput {
             .borderRadius(20)
             .backgroundColor($r('app.color.danger'))
             .margin({
-              bottom:60,
+              bottom: 60,
               left: 30
             })
           } else if (this.voiceState === VoiceRecordEnum.Transfer) {
@@ -34,7 +34,7 @@ struct VoiceInput {
             .borderRadius(20)
             .backgroundColor($r('app.color.chat_primary'))
             .margin({
-              bottom:60,
+              bottom: 60,
             })
 
           } else if (this.voiceState === VoiceRecordEnum.Recording) {
@@ -47,15 +47,15 @@ struct VoiceInput {
             .borderRadius(20)
             .backgroundColor($r('app.color.chat_primary'))
             .margin({
-              bottom:60,
+              bottom: 60,
             })
 
           }
         }.width('100%')
         .justifyContent(this.voiceState === VoiceRecordEnum.Cancel ? FlexAlign.Start : FlexAlign.Center)
         .padding({
-          left:40,
-          right:40
+          left: 40,
+          right: 40
         })
 
         Row() {
@@ -107,7 +107,6 @@ struct VoiceInput {
         .margin({
           bottom: 30
         })
-
 
         Stack() {
           Image($r("app.media.ic_public_output"))

@@ -55,6 +55,15 @@ struct ChatDetail {
     }, 1000)
   }
 
+  // 发送语音消息
+  sendAudioMessage(message: MessageInfoModel) {
+    this.messageList.push(message)
+    this.scroller.scrollEdge(Edge.Bottom)
+    // 写入首选项
+    WeChatStore.addOneWeChatMessage(this.talkUser.user_id, message) //添加聊天记录
+
+  }
+
   //获取响应的消息
   async getResponseMessage(content: string) {
     this.talkUserInputIng = true
@@ -87,7 +96,6 @@ struct ChatDetail {
       WeChatStore.delOneWeChatMessage(this.talkUser.user_id, messId)
     }
   }
-
 
   build() {
     Column() {
@@ -134,6 +142,9 @@ struct ChatDetail {
       BottomInput({
         sentTextMessage: (content: string) => {
           this.sentTextMessage(content)
+        },
+        sendAudioMessage: (newMessage: MessageInfoModel) => {
+          this.sendAudioMessage(newMessage)
         }
       })
     }.justifyContent(FlexAlign.SpaceBetween)

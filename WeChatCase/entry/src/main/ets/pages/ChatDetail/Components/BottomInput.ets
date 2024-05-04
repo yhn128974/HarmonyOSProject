@@ -1,16 +1,28 @@
 import { display, promptAction } from '@kit.ArkUI'
-import { VoiceRecordEnum } from '../../../models/voice'
+
 import VoiceInput from './VoiceInput'
 import { abilityAccessCtrl, bundleManager, common } from '@kit.AbilityKit'
 import { constant } from '@kit.ConnectivityKit'
+import AudioCapturer from '../../../utils/audio_recorder'
+import { FileCommon } from '../../../utils/file_operate'
+import { VoiceRecordEnum } from '../../../models/voice'
+import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../../models/message'
+import { WeChat_CurrentUserKey } from '../../../constant'
+import { UserInfo, UserInfoModel } from '../../../models/user'
 
 @Preview
 @Component
 struct BottomInput {
+  @StorageProp(WeChat_CurrentUserKey)
+  currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
+  @Consume talkUser: UserInfoModel
   @State showVoice: boolean = false //是否显示语音输入
   @State content: string = '' //输入内容
+  // 发送文本
   sentTextMessage: (content: string) => void = () => {
-
+  }
+  // 发送音频消息的方法
+  sendAudioMessage: (message: MessageInfoModel) => void = () => {
   }
   @State isShowVoiceBuilder: boolean = false
   @Provide
@@ -18,6 +30,9 @@ struct BottomInput {
   // 需要知道整体的屏幕宽度
   screenWidth: number = 0
   screenHeight: number = 0
+  tempAudioPath: string = ""
+  duration: number = 0 //音频的秒数
+  timer: number = -1 //定时器的标记
 
   // 显示语音输入组件
   @Builder
@@ -30,6 +45,11 @@ struct BottomInput {
 
   aboutToAppear(): void {
     this.getScreenWidth()
+    AudioCapturer.init()
+  }
+
+  aboutToDisappear(): void {
+    AudioCapturer.release()
   }
 
   async getScreenWidth() {
@@ -40,6 +60,7 @@ struct BottomInput {
     }
   }
 
+  // 检查权限
   checkPermission() {
     const result = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
     const manger = abilityAccessCtrl.createAtManager() //创建一个manger
@@ -60,7 +81,64 @@ struct BottomInput {
 
     } else {
       this.isShowVoiceBuilder = true
+      this.beginCollectVoice()
+
     }
+  }
+
+  // 开始录音
+  beginCollectVoice() {
+    this.tempAudioPath = FileCommon.createAudioFile() //创建音频文件
+    AudioCapturer.start(this.tempAudioPath) //开始录音了
+    this.startTime()
+  }
+
+  // 松手逻辑
+  releaseFinger() {
+    this.isShowVoiceBuilder = false
+    this.endTime()
+    AudioCapturer.stop()
+    if (this.voiceState === VoiceRecordEnum.Cancel) {
+      //   取消发生
+      FileCommon.delFilePath(this.tempAudioPath) //删除文件
+    }
+    if (this.voiceState === VoiceRecordEnum.Recording) {
+      // 发送语音
+      this.sendAudio()
+    }
+    if (this.voiceState === VoiceRecordEnum.Transfer) {
+      // 转化文本
+    }
+    // 无论是什么状态，最终到要回到正常状态
+    this.voiceState = VoiceRecordEnum.Recording
+    promptAction.showToast({ message: '计时' + this.duration })
+    //  该发消息了
+
+  }
+
+  //发送语音
+  sendAudio() {
+    let newMessage = new MessageInfoModel({
+      sourceDuration: this.duration, //时长
+      messageContent: `[语音]${this.duration}'`,
+      messageType: MessageTypeEnum.AUDIO,
+      sendUser: this.currentUser,
+      connectUser: this.talkUser,
+      sourceFilePath: this.tempAudioPath,
+    } as MessageInfo)
+    this.sendAudioMessage(newMessage)
+    this.duration = 0 //重置时长
+    this.tempAudioPath = '' //清除路径
+  }
+
+  startTime() {
+    this.timer = setInterval(() => {
+      this.duration++
+    }, 1000)
+  }
+
+  endTime() {
+    clearInterval(this.timer)
   }
 
   build() {
@@ -92,7 +170,8 @@ struct BottomInput {
                   // this.isShowVoiceBuilder = true
                 })
                 .onActionEnd(() => {
-                  this.isShowVoiceBuilder = false
+                  this.releaseFinger()
+
                 }),
               PanGesture().onActionUpdate((event) => {
 
@@ -108,10 +187,7 @@ struct BottomInput {
                   }
                 }
               })
-
             )
-
-
           )
       } else {
         TextInput({
