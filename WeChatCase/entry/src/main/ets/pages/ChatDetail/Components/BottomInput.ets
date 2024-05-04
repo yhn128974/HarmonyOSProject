@@ -103,6 +103,13 @@ struct BottomInput {
       FileCommon.delFilePath(this.tempAudioPath) //删除文件
     }
     if (this.voiceState === VoiceRecordEnum.Recording) {
+      FileCommon.delFilePath(this.tempAudioPath) //删除文件
+      if (this.duration < 1) {
+        promptAction.showToast({
+          message: '音频时长过短'
+        })
+        return
+      }
       // 发送语音
       this.sendAudio()
     }

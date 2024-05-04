@@ -1,5 +1,5 @@
 import { WeChat_CurrentUserKey } from '../../../constant'
-import { MessageInfo, MessageInfoModel } from '../../../models/message'
+import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../../models/message'
 import { UserInfo, UserInfoModel } from '../../../models/user'
 import { promptAction } from '@kit.ArkUI'
 import { PopupItem } from '../../../models/popup'
@@ -49,7 +49,6 @@ export struct Message {
 
   @Builder
   getContent() {
-
     GridRow({ columns: 5 }) {
       ForEach(this.popupList, (item: PopupItem) => {
         GridCol() {
@@ -70,28 +69,76 @@ export struct Message {
 
   }
 
+  getAudioWidth() {
+    let minWidth: number = 20
+    let maxWidth: number = 90
+    let calWidth: number = minWidth + (100 * this.currentMessage.sourceDuration / 60)
+    if (calWidth > maxWidth) return maxWidth + "%"
+    return calWidth + "%"
+  }
+
+  //实现多个builder
+  @Builder
+  getTextContent() {
+    Text(this.currentMessage.messageContent)
+      .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
+      .fontColor($r('app.color.text_primary'))
+      .padding(10)
+      .margin({
+        left: 10,
+        right: 10
+      })
+      .borderRadius(4)
+
+  }
+
+  @Builder
+  getAudioContent() {
+    Row({
+      space: 5
+    }) {
+      Text(`${this.currentMessage.sourceDuration}'`).fontColor($r('app.color.text_primary'))
+      Image($r('app.media.ic_public_recorder')).width(20).aspectRatio(1).rotate({
+        angle: this.isOwnMessage ? 180 : 0
+      })
+
+
+    }
+    .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
+    .padding(10)
+    .margin({
+      left: 10,
+      right: 10
+    })
+    .borderRadius(4)
+    .width(this.getAudioWidth())
+    .direction(this.isOwnMessage ? Direction.Rtl : Direction.Ltr)
+
+  }
+
   build() {
     Row() {
       Image(this.currentMessage.sendUser.avatar).width(40).aspectRatio(1).borderRadius(4)
+
       Row() {
-        Text(this.currentMessage.messageContent)
-          .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
-          .fontColor($r('app.color.text_primary'))
-          .padding(10)
-          .margin({
-            left: 10,
-            right: 10
-          })
-          .borderRadius(4)// 添加弹层
-          .bindPopup(this.showPopup, {
-            builder: this.getContent(),
-            popupColor: $r('app.color.popup_back'),
-            backgroundBlurStyle: BlurStyle.NONE, //把失焦的模式设置为null，是否颜色不保持
-            onStateChange: (isVisible) => {
-              // 当手指点了其他位置，关闭状态
-              this.showPopup = isVisible.isVisible
-            }
-          })
+        Column() {
+          if (this.currentMessage.messageType === MessageTypeEnum.TEXT) {
+            this.getTextContent()
+          }
+          if (this.currentMessage.messageType === MessageTypeEnum.AUDIO) {
+            this.getAudioContent()
+          }
+        } // 添加弹层
+        .bindPopup(this.showPopup, {
+          builder: this.getContent(),
+          popupColor: $r('app.color.popup_back'),
+          backgroundBlurStyle: BlurStyle.NONE, //把失焦的模式设置为null，是否颜色不保持
+          onStateChange: (isVisible) => {
+            // 当手指点了其他位置，关闭状态
+            this.showPopup = isVisible.isVisible
+          }
+        })
+
       }
 
       .justifyContent(this.isOwnMessage ? FlexAlign.End : FlexAlign.Start)
