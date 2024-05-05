@@ -9,6 +9,16 @@ import { VoiceRecordEnum } from '../../../models/voice'
 import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../../models/message'
 import { WeChat_CurrentUserKey } from '../../../constant'
 import { UserInfo, UserInfoModel } from '../../../models/user'
+import { PopupItem } from '../../../models/popup'
+import { fileIo, picker } from '@kit.CoreFileKit'
+import { util } from '@kit.ArkTS'
+// 导入相机需要依赖
+import cameraPicker from '@ohos.multimedia.cameraPicker';
+import camera from '@ohos.multimedia.camera';
+import { BusinessError } from '@ohos.base';
+
+let mContext = getContext(this) as common.Context;
+
 
 @Preview
 @Component
@@ -18,12 +28,6 @@ struct BottomInput {
   @Consume talkUser: UserInfoModel
   @State showVoice: boolean = false //是否显示语音输入
   @State content: string = '' //输入内容
-  // 发送文本
-  sentTextMessage: (content: string) => void = () => {
-  }
-  // 发送音频消息的方法
-  sendAudioMessage: (message: MessageInfoModel) => void = () => {
-  }
   @State isShowVoiceBuilder: boolean = false
   @Provide
   voiceState: VoiceRecordEnum = VoiceRecordEnum.Recording
@@ -33,6 +37,67 @@ struct BottomInput {
   tempAudioPath: string = ""
   duration: number = 0 //音频的秒数
   timer: number = -1 //定时器的标记
+  @State
+  bottomList: PopupItem[] = [
+    {
+      icon: $r('app.media.ic_public_photo'),
+      title: '照片',
+      //   发送照片,打开相册 发送照片
+      itemClick: () => {
+        this.sendPhoto()
+      }
+
+
+    },
+    {
+      icon: $r('app.media.ic_public_carema'),
+      title: '拍摄',
+
+    },
+    {
+      icon: $r('app.media.ic_statusbar_gps'),
+      title: '位置',
+      itemClick: () => {
+        this.openCamera()
+      }
+    },
+    {
+      icon: $r('app.media.ic_public_voice'),
+      title: '语音输入',
+
+    },
+    {
+      icon: $r("app.media.ic_public_collect"),
+      title: '收藏',
+
+    },
+    {
+      icon: $r("app.media.ic_public_contacts_filled"),
+      title: '个人名片',
+
+    },
+    {
+      icon: $r("app.media.ic_public_folder_filled"),
+      title: '文件',
+
+    },
+    {
+      icon: $r("app.media.ic_public_music_filled"),
+      title: '音乐',
+    }]
+  @State
+  showBottomCard: boolean = false // 显示底部
+  // 发送文本
+  sentTextMessage: (content: string) => void = () => {
+  }
+  // 发送音频消息的方法
+  sendAudioMessage: (message: MessageInfoModel) => void = () => {
+  }
+  // 发送图片消息
+  sendImageMessage: (list: MessageInfoModel[]) => void = () => {
+  }
+  // 文本控制器
+  textController: TextInputController = new TextInputController() //文本控制器
 
   // 显示语音输入组件
   @Builder
@@ -40,7 +105,100 @@ struct BottomInput {
     Column() {
       VoiceInput()
     }
+  }
 
+  @Builder
+  getBottomCard(item: PopupItem) {
+    Column() {
+      Column() {
+        Image(item.icon)
+          .width(30)
+          .height(30)
+          .fillColor("#4c4c4c")
+      }
+      .backgroundColor(Color.White)
+      .width(56)
+      .aspectRatio(1)
+      .borderRadius(10)
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+
+      Text(item.title)
+        .fontSize(12)
+        .fontColor($r('app.color.text_second'))
+        .margin({
+          top: 10
+        })
+    }.layoutWeight(1)
+    .alignItems(HorizontalAlign.Center)
+    .onClick(() => {
+      item.itemClick && item.itemClick()
+    })
+
+  }
+
+  // 打开相机
+  async openCamera() {
+    const result = await cameraPicker.pick(getContext(), [
+      cameraPicker.PickerMediaType.PHOTO,
+      cameraPicker.PickerMediaType.VIDEO
+    ], {
+      cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK//后置摄像头
+    })
+    if (result.mediaType === cameraPicker.PickerMediaType.PHOTO) {
+      const file = fileIo.openSync(result.resultUri, fileIo.OpenMode.READ_ONLY)
+      const filePath = getContext().filesDir + '/' + util.generateRandomUUID() + 'jpg'
+      fileIo.copyFileSync(file.fd, filePath)
+      fileIo.closeSync(file.fd)
+
+      this.sendImageMessage([new MessageInfoModel({
+        connectUser: this.talkUser,
+        sendUser: this.currentUser,
+        sourceFilePath: filePath,
+        messageType: MessageTypeEnum.IMAGE,
+        messageContent: "[图片]"
+      } as MessageInfo)])
+
+    }
+    AlertDialog.show({
+      message: JSON.stringify(result)
+    })
+  }
+
+  // 发送图片
+  async sendPhoto() {
+    //   打开相册
+    const photo = new picker.PhotoViewPicker()
+    let result = await photo.select({
+      MIMEType: picker.PhotoViewMIMETypes.IMAGE_TYPE,
+      maxSelectNumber: 9
+    })
+
+    AlertDialog.show({ message: JSON.stringify(result.photoUris) })
+    let messList: MessageInfoModel[] = []
+
+    result.photoUris.forEach(url => {
+      const file = fileIo.openSync(url, fileIo.OpenMode.READ_ONLY)
+      const newFileName = getContext().filesDir + "/" + util.generateRandomUUID() + '.jpg'
+      fileIo.copyFileSync(file.fd, newFileName)
+      // 发了一张图片，一个消息
+      messList.push(
+        new MessageInfoModel({
+          connectUser: this.talkUser,
+          sendUser: this.currentUser,
+          sourceFilePath: newFileName,
+          messageType: MessageTypeEnum.IMAGE,
+          messageContent: "[图片]"
+        } as MessageInfo)
+      )
+      fileIo.closeSync(file.fd) //关闭相册的读取
+      //   循环结束之后 发送消息 发送一个列表
+      this.sendImageMessage(messList)
+      animateTo({ duration: 150 }, () => {
+        this.showBottomCard = false
+      })
+
+    })
   }
 
   aboutToAppear(): void {
@@ -100,7 +258,9 @@ struct BottomInput {
     AudioCapturer.stop()
     if (this.voiceState === VoiceRecordEnum.Cancel) {
       //   取消发生
+
       FileCommon.delFilePath(this.tempAudioPath) //删除文件
+      this.duration = 0
     }
     if (this.voiceState === VoiceRecordEnum.Recording) {
       FileCommon.delFilePath(this.tempAudioPath) //删除文件
@@ -149,87 +309,124 @@ struct BottomInput {
   }
 
   build() {
-    Row() {
-      Image(this.showVoice ? $r('app.media.ic_public_keyboard') : $r('app.media.ic_public_sound'))
-        .width(25)
-        .aspectRatio(1)
-        .onClick(() => {
-          this.showVoice = !this.showVoice
-        })
-      if (this.showVoice) {
-        Button('按住说话')
-          .type(ButtonType.Normal)
-          .fontColor($r('app.color.text_primary'))
-          .layoutWeight(1)
-          .height(35)
-          .borderRadius(2)
-          .backgroundColor($r('app.color.white'))
-          .margin({
-            left: 10,
-            right: 10
+    Column() {
+      Row() {
+        Image(this.showVoice ? $r('app.media.ic_public_keyboard') : $r('app.media.ic_public_sound'))
+          .width(25)
+          .aspectRatio(1)
+          .onClick(() => {
+            this.showVoice = !this.showVoice
+            animateTo({
+              duration: 100
+            }, () => {
+              this.showBottomCard = false
+            })
           })
-          .gesture(
-            GestureGroup(GestureMode.Parallel,
-              LongPressGesture()
-                .onAction(() => {
-                  // 进行权限检查
-                  this.checkPermission()
-                  // this.isShowVoiceBuilder = true
-                })
-                .onActionEnd(() => {
-                  this.releaseFinger()
-
-                }),
-              PanGesture().onActionUpdate((event) => {
-
-                if (event.fingerList[0].globalY > this.screenHeight - 120) {
-                  // 没有出录音
-                  this.voiceState = VoiceRecordEnum.Recording
-
-                } else {
-                  if (event.fingerList[0].globalX <= this.screenWidth / 2) {
-                    this.voiceState = VoiceRecordEnum.Cancel
+        if (this.showVoice) {
+          Button('按住说话')
+            .type(ButtonType.Normal)
+            .fontColor($r('app.color.text_primary'))
+            .layoutWeight(1)
+            .height(35)
+            .borderRadius(2)
+            .backgroundColor($r('app.color.white'))
+            .margin({
+              left: 10,
+              right: 10
+            })
+            .gesture(
+              GestureGroup(GestureMode.Parallel,
+                LongPressGesture()
+                  .onAction(() => {
+                    // 进行权限检查
+                    this.checkPermission()
+                    // this.isShowVoiceBuilder = true
+                  })
+                  .onActionEnd(() => {
+                    this.releaseFinger()
+                  }),
+                PanGesture().onActionUpdate((event) => {
+                  if (event.fingerList[0].globalY > this.screenHeight - 120) {
+                    // 没有出录音
+                    this.voiceState = VoiceRecordEnum.Recording
                   } else {
-                    this.voiceState = VoiceRecordEnum.Transfer
+                    if (event.fingerList[0].globalX <= this.screenWidth / 2) {
+                      this.voiceState = VoiceRecordEnum.Cancel
+                    } else {
+                      this.voiceState = VoiceRecordEnum.Transfer
+                    }
                   }
-                }
-              })
+                })
+              )
             )
-          )
-      } else {
-        TextInput({
-          text: $$this.content
-        })
-          .onSubmit(() => {
-            if (this.content) {
-              this.sentTextMessage(this.content)
-              this.content = ''
-            }
+        } else {
+          TextInput({
+            text: $$this.content,
+            controller: this.textController
           })
-          .layoutWeight(1)
-          .height(35)
-          .borderRadius(2)
-          .backgroundColor($r('app.color.white'))
-          .margin({
-            left: 10,
-            right: 10
+            .onClick(() => {
+              animateTo({
+                duration: 150
+              }, () => {
+                this.showBottomCard = false
+              })
+            })
+            .onSubmit(() => {
+              if (this.content) {
+                this.sentTextMessage(this.content)
+                this.content = ''
+              }
+            })
+            .layoutWeight(1)
+            .height(35)
+            .borderRadius(2)
+            .backgroundColor($r('app.color.white'))
+            .margin({
+              left: 10,
+              right: 10
+            })
+        }
+
+        Image($r('app.media.ic_public_add_norm')).width(25).aspectRatio(1)
+          .onClick(() => {
+            animateTo({
+              duration: 100
+            }, () => {
+              this.showBottomCard = !this.showBottomCard
+              if (this.showBottomCard) {
+                this.textController.stopEditing() //关闭编辑
+              }
+            })
           })
       }
-      Image($r('app.media.ic_public_add_norm')).width(25).aspectRatio(1)
+      .width('100%')
+      .padding({
+        left: 10,
+        right: 10
+      })
+      .height(60)
+      .backgroundColor($r('app.color.second_back_color'))
+      .bindContentCover(
+        this.isShowVoiceBuilder,
+        this.VoiceBuilder(),
+        // 配置参数
+        { modalTransition: ModalTransition.NONE })
+
+      if (this.showBottomCard) {
+        Column() {
+          // 底部结构
+          GridRow({ columns: 4 }) {
+            ForEach(this.bottomList, (item: PopupItem) => {
+              GridCol() {
+                this.getBottomCard(item)
+              }.height(100)
+            })
+          }
+          .width('100%')
+        }.backgroundColor($r('app.color.second_back_color'))
+      }
 
     }
-    .width('100%')
-    .padding({
-      left: 10,
-      right: 10
-    })
-    .height(60)
-    .backgroundColor($r('app.color.second_back_color'))
-    .bindContentCover(
-      this.isShowVoiceBuilder,
-      this.VoiceBuilder(),
-      // 配置参数
-      { modalTransition: ModalTransition.NONE })
   }
 }
 

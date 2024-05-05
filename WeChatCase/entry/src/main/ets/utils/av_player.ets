@@ -1,47 +1,43 @@
-import { audio } from '@kit.AudioKit'
-import { media } from '@kit.MediaKit'
+import media from '@ohos.multimedia.media'
 
-export class AVplayer {
-  avplayer: media.AVPlayer | null = null //初始属性
-  count: number = 0
-
+export class AvPlayer {
+  avPlayer: media.AVPlayer | null = null
   async init() {
-    this.avplayer = await media.createAVPlayer()
+    this.avPlayer = await media.createAVPlayer()
+    this.watchCallBack()
   }
-
-  watchCallBack() {
-    this.avplayer?.on("stateChange", (state: string) => {
+  watchCallBack () {
+    this.avPlayer?.on("stateChange", (state: string) => {
       switch (state) {
-        case 'idle': // 成功调用reset接口后触发该状态机上报
-          console.info('AVPlayer state idle called.');
-          this.avplayer?.release(); // 调用release接口销毁实例对象
-          break;
-        case 'initialized': // avplayer 设置播放源后触发该状态上报  ，要给avplayer的url或者fdsrc赋值就可以触发初始化
+        case 'initialized': // avplayer 设置播放源后触发该状态上报
           console.info('AVPlayer state initialized called.');
-          this.avplayer?.prepare();
+          this.avPlayer?.prepare()
           break;
-        case 'prepared': // prepare调用成功后上报该状态机
+        case 'prepared': // prepare调用成功后上报该状态机cesi
           console.info('AVPlayer state prepared called.');
-          this.avplayer?.play(); // 调用播放接口开始播放
+          this.avPlayer?.play()
           break;
         case 'playing': // play成功调用后触发该状态机上报
           console.info('AVPlayer state playing called.');
-
           break;
         case 'paused': // pause成功调用后触发该状态机上报
           console.info('AVPlayer state paused called.');
-
           break;
         case 'completed': // 播放结束后触发该状态机上报
           console.info('AVPlayer state completed called.');
-          this.avplayer?.stop(); //调用播放结束接口
+          this.avPlayer?.reset(); //调用播放结束接口
           break;
         case 'stopped': // stop接口成功调用后触发该状态机上报
           console.info('AVPlayer state stopped called.');
-          this.avplayer?.reset(); // 调用reset接口初始化avplayer状态
+          this.avPlayer?.reset(); //调用播放结束接口
           break;
         case 'released':
           console.info('AVPlayer state released called.');
+          this.avPlayer?.reset(); //调用播放结束接口
+          break;
+        case 'error':
+          console.error('AVPlayer state error called.')
+          this.avPlayer?.reset(); //调用播放结束接口
           break;
         default:
           console.info('AVPlayer state unknown called.');
@@ -49,12 +45,16 @@ export class AVplayer {
       }
     })
   }
-
-  //   play 播放方法
   async play(fileName: string) {
-    const fileDes = await getContext().resourceManager.getRawFd(fileName)
-    //
-    this.avplayer!.fdSrc = fileDes
-
+    let fileDescriptor = await getContext().resourceManager.getRawFd(fileName);
+    let avFileDescriptor: media.AVFileDescriptor =
+      { fd: fileDescriptor.fd, offset: fileDescriptor.offset, length: fileDescriptor.length }
+    this.avPlayer!.fdSrc = avFileDescriptor
+  }
+  async stop () {
+    await this.avPlayer?.stop()
+  }
+  async release () {
+    await this.avPlayer?.release()
   }
 }

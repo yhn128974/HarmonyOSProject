@@ -57,6 +57,10 @@ export struct Message {
   // 删除信息的方法
   delMessage: (messId: string) => void = () => {
   }
+  //   预览方法
+  previewImage: () => void = () => {
+
+  }
 
   @Builder
   getContent() {
@@ -156,6 +160,25 @@ export struct Message {
     })
   }
 
+  @Builder
+  getImageContent() {
+    Column() {
+      // 沙箱目录要想显示在image上必须加上 file://
+      Image("file://" + this.currentMessage.sourceFilePath)
+        .borderRadius(4)
+        .width('100%')
+        .enabled(false)
+    }
+    .onClick(() => {
+      this.previewImage()
+    })
+    .width('40%')
+    .margin({
+      left: 10,
+      right: 10
+    })
+  }
+
   build() {
     Row() {
       Image(this.currentMessage.sendUser.avatar).width(40).aspectRatio(1).borderRadius(4)
@@ -166,6 +189,9 @@ export struct Message {
           }
           if (this.currentMessage.messageType === MessageTypeEnum.AUDIO) {
             this.getAudioContent()
+          }
+          if (this.currentMessage.messageType === MessageTypeEnum.IMAGE) {
+            this.getImageContent()
           }
         } // 添加弹层
         .bindPopup(this.showPopup, {

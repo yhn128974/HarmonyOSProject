@@ -10,20 +10,32 @@ import { getRequestMessage } from '../../utils/request'
 import { ChatResponse, ChatResponseModel } from '../../models/chat';
 import { WeChatStore } from '../../utils/chat_store';
 import { AudioRenderer } from '../../utils/audio_renderer';
-import { AVplayer } from '../../utils/av_player';
+import { AvPlayer } from '../../utils/av_player';
+import PreviewImag from './Components/previewDialog'
 
 @Entry
 @Component
 struct ChatDetail {
+  //////////////////////////////////////////图片预览
+  previewUrl: string = ''
+  previewController: CustomDialogController = new CustomDialogController({
+    builder: PreviewImag({
+      url: this.previewUrl
+    }),
+    customStyle: true,
+    autoCancel: false
+  })
+  /////////////////////////////////////////////////////////////////
   @StorageProp(WeChat_CurrentUserKey)
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Provide talkUser: UserInfoModel = new UserInfoModel({} as UserInfo) //好友
   @State messageList: MessageInfoModel[] = []
   @State talkUserInputIng: boolean = false;
   scroller = new Scroller()
-  player: AVplayer = new AVplayer() //初始化播放器
+  player: AvPlayer = new AvPlayer() //初始化播放器
 
   aboutToAppear(): void {
+    this.scroller.scrollEdge(Edge.End)
     this.getTalkUser()
     //   初始化音频播放
     AudioRenderer.init()
@@ -77,10 +89,12 @@ struct ChatDetail {
   // 发送语音消息
   sendAudioMessage(message: MessageInfoModel) {
     this.messageList.push(message)
+
     this.scroller.scrollEdge(Edge.Bottom)
     // 写入首选项
     WeChatStore.addOneWeChatMessage(this.talkUser.user_id, message) //添加聊天记录
-
+    // 发出声音提示
+    this.player.play("send.wav")
 
   }
 
@@ -100,6 +114,16 @@ struct ChatDetail {
     this.talkUserInputIng = false
     //
     this.scroller.scrollEdge(Edge.Bottom)
+  }
+
+  // 发送图片消息的方法
+  sendImageMessage(list: MessageInfoModel[]) {
+    this.messageList.push(...list) //将两个数组合并
+    this.scroller.scrollEdge(Edge.Bottom) //滚动到底部
+    list.forEach(item => {
+      WeChatStore.addOneWeChatMessage(this.talkUser.user_id, item) //添加聊天记录
+    })
+    this.player.play('send.wav')
   }
 
   // 删除信息的方法
@@ -143,6 +167,10 @@ struct ChatDetail {
                 currentMessage: item,
                 delMessage: (messId: string) => {
                   this.delMessage(messId)
+                },
+                previewImage: () => {
+                  this.previewUrl = "file://" + item.sourceFilePath
+                  this.previewController.open()//打开预览
                 }
               })
             }
@@ -165,6 +193,9 @@ struct ChatDetail {
         },
         sendAudioMessage: (newMessage: MessageInfoModel) => {
           this.sendAudioMessage(newMessage)
+        },
+        sendImageMessage: (list: MessageInfoModel[]) => {
+          this.sendImageMessage(list)
         }
       })
     }.justifyContent(FlexAlign.SpaceBetween)
