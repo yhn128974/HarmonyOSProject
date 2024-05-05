@@ -3,10 +3,12 @@ import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../../models/
 import { UserInfo, UserInfoModel } from '../../../models/user'
 import { promptAction } from '@kit.ArkUI'
 import { PopupItem } from '../../../models/popup'
+import { AudioRenderer } from '../../../utils/audio_renderer'
 
 @Preview
 @Component
 export struct Message {
+  @State audioState:AnimationStatus=AnimationStatus.Initial
   @StorageProp(WeChat_CurrentUserKey)
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Require
@@ -98,11 +100,34 @@ export struct Message {
       space: 5
     }) {
       Text(`${this.currentMessage.sourceDuration}'`).fontColor($r('app.color.text_primary'))
-      Image($r('app.media.ic_public_recorder')).width(20).aspectRatio(1).rotate({
-        angle: this.isOwnMessage ? 180 : 0
-      })
 
+      // Image($r('app.media.ic_public_recorder')).width(20).aspectRatio(1).rotate({
+      //   angle: this.isOwnMessage ? 180 : 0
+      // })
 
+      ImageAnimator()
+        .images([
+          {
+            src: $r('app.media.ic_public_voice3')
+          },
+          {
+            src: $r('app.media.ic_public_voice1')
+          },
+          {
+            src: $r('app.media.ic_public_voice2')
+          },
+          {
+            src: $r('app.media.ic_public_voice3')
+          },
+        ])
+        .state(this.audioState)
+        .reverse(true)
+        .iterations(-1)
+        .width(20)
+        .aspectRatio(1)
+        .rotate({
+          angle: this.isOwnMessage ? 180 : 0
+        })
     }
     .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
     .padding(10)
@@ -113,13 +138,18 @@ export struct Message {
     .borderRadius(4)
     .width(this.getAudioWidth())
     .direction(this.isOwnMessage ? Direction.Rtl : Direction.Ltr)
+    .onClick(()=>{
+      AudioRenderer.start(this.currentMessage.sourceFilePath,()=>{
+        this.audioState=AnimationStatus.Stopped
+      })//播放
+      this.audioState=AnimationStatus.Running
+    })
 
   }
 
   build() {
     Row() {
       Image(this.currentMessage.sendUser.avatar).width(40).aspectRatio(1).borderRadius(4)
-
       Row() {
         Column() {
           if (this.currentMessage.messageType === MessageTypeEnum.TEXT) {
@@ -138,14 +168,11 @@ export struct Message {
             this.showPopup = isVisible.isVisible
           }
         })
-
       }
-
       .justifyContent(this.isOwnMessage ? FlexAlign.End : FlexAlign.Start)
       .gesture(LongPressGesture().onAction(() => {
         this.showPopup = true
       }))
-
       .layoutWeight(6)
 
       Row().layoutWeight(1)

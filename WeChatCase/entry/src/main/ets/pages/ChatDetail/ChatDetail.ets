@@ -9,6 +9,7 @@ import { promptAction } from '@kit.ArkUI';
 import { getRequestMessage } from '../../utils/request'
 import { ChatResponse, ChatResponseModel } from '../../models/chat';
 import { WeChatStore } from '../../utils/chat_store';
+import { AudioRenderer } from '../../utils/audio_renderer';
 
 @Entry
 @Component
@@ -22,6 +23,17 @@ struct ChatDetail {
 
   aboutToAppear(): void {
     this.getTalkUser()
+    //   初始化音频播放
+    AudioRenderer.init()
+  }
+
+  aboutToDisappear(): void {
+    this.releaseAudio()
+  }
+
+  async releaseAudio() {
+    await AudioRenderer.stop() //先暂停在释放
+    AudioRenderer.release()
   }
 
   getTalkUser() {
@@ -35,7 +47,6 @@ struct ChatDetail {
   async getAllRecord() {
     // 异步promise需要await 修饰符接受参数
     this.messageList = await WeChatStore.getWeChatMessage(this.talkUser.user_id)
-
     this.scroller.scrollEdge(Edge.Bottom)
   }
 
