@@ -4,11 +4,12 @@ import { UserInfo, UserInfoModel } from '../../../models/user'
 import { promptAction } from '@kit.ArkUI'
 import { PopupItem } from '../../../models/popup'
 import { AudioRenderer } from '../../../utils/audio_renderer'
+import { FileCommon } from '../../../utils/file_operate'
 
 @Preview
 @Component
 export struct Message {
-  @State audioState:AnimationStatus=AnimationStatus.Initial
+  @State audioState: AnimationStatus = AnimationStatus.Initial
   @StorageProp(WeChat_CurrentUserKey)
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Require
@@ -26,25 +27,33 @@ export struct Message {
     {
       title: '收藏',
       icon: $r("app.media.ic_public_cube")
-    }, {
-    title: '转文字',
-    icon: $r("app.media.ic_public_trans_text")
-  }, {
-    title: '删除',
-    icon: $r("app.media.ic_public_cancel"),
-    itemClick: () => {
-      this.delMessage(this.currentMessage.id)
-    }
-  }, {
-    title: '多选',
-    icon: $r("app.media.ic_public_multi_select")
-  }, {
-    title: '引用',
-    icon: $r("app.media.ic_public_link")
-  }, {
-    title: '提醒',
-    icon: $r("app.media.ic_public_warin")
-  }]
+    },
+    {
+      title: '转文字',
+      icon: $r("app.media.ic_public_trans_text")
+    },
+    {
+      title: '删除',
+      icon: $r("app.media.ic_public_cancel"),
+      itemClick: () => {
+        if (this.currentMessage.sourceFilePath) {
+          FileCommon.delFilePath(this.currentMessage.sourceFilePath)
+        }
+        this.delMessage(this.currentMessage.id)
+      }
+    },
+    {
+      title: '多选',
+      icon: $r("app.media.ic_public_multi_select")
+    },
+    {
+      title: '引用',
+      icon: $r("app.media.ic_public_link")
+    },
+    {
+      title: '提醒',
+      icon: $r("app.media.ic_public_warin")
+    }]
   // 删除信息的方法
   delMessage: (messId: string) => void = () => {
   }
@@ -61,6 +70,7 @@ export struct Message {
         }.onClick(() => {
           // 判断点击事件是否存在并且存在就执行
           item.itemClick && item.itemClick()
+
         })
       })
     }.padding({
@@ -138,13 +148,12 @@ export struct Message {
     .borderRadius(4)
     .width(this.getAudioWidth())
     .direction(this.isOwnMessage ? Direction.Rtl : Direction.Ltr)
-    .onClick(()=>{
-      AudioRenderer.start(this.currentMessage.sourceFilePath,()=>{
-        this.audioState=AnimationStatus.Stopped
-      })//播放
-      this.audioState=AnimationStatus.Running
+    .onClick(() => {
+      AudioRenderer.start(this.currentMessage.sourceFilePath, () => {
+        this.audioState = AnimationStatus.Stopped
+      }) //播放
+      this.audioState = AnimationStatus.Running
     })
-
   }
 
   build() {

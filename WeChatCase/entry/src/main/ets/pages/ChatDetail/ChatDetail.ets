@@ -10,6 +10,7 @@ import { getRequestMessage } from '../../utils/request'
 import { ChatResponse, ChatResponseModel } from '../../models/chat';
 import { WeChatStore } from '../../utils/chat_store';
 import { AudioRenderer } from '../../utils/audio_renderer';
+import { AVplayer } from '../../utils/av_player';
 
 @Entry
 @Component
@@ -20,11 +21,13 @@ struct ChatDetail {
   @State messageList: MessageInfoModel[] = []
   @State talkUserInputIng: boolean = false;
   scroller = new Scroller()
+  player: AVplayer = new AVplayer() //初始化播放器
 
   aboutToAppear(): void {
     this.getTalkUser()
     //   初始化音频播放
     AudioRenderer.init()
+    this.player.init()
   }
 
   aboutToDisappear(): void {
@@ -52,11 +55,15 @@ struct ChatDetail {
 
   //发送文本消息
   sentTextMessage(content: string) {
+
     let newMessageInfoModel: MessageInfoModel = new MessageInfoModel({} as MessageInfo)
     newMessageInfoModel.sendUser = this.currentUser //发消息的主体是当前用户
     newMessageInfoModel.connectUser = this.talkUser //链接的主体是聊天对象
     newMessageInfoModel.messageContent = content
     this.messageList.push(newMessageInfoModel)
+
+    // 发出声音提示
+    this.player.play("send.wav")
     // 添加聊天记录到首选项中
     WeChatStore.addOneWeChatMessage(this.talkUser.user_id, newMessageInfoModel)
     //
@@ -64,6 +71,7 @@ struct ChatDetail {
     setTimeout(() => {
       this.getResponseMessage(content)
     }, 1000)
+
   }
 
   // 发送语音消息
@@ -72,6 +80,7 @@ struct ChatDetail {
     this.scroller.scrollEdge(Edge.Bottom)
     // 写入首选项
     WeChatStore.addOneWeChatMessage(this.talkUser.user_id, message) //添加聊天记录
+
 
   }
 

@@ -1,9 +1,15 @@
-import { weChat_StoreKey, WeChat_ConnectKey, WeChat_CurrentUserKey, WeChat_UserRecordKey,
-  Record_Update_EventName, } from '../constant'
+import {
+  weChat_StoreKey,
+  WeChat_ConnectKey,
+  WeChat_CurrentUserKey,
+  WeChat_UserRecordKey,
+  Record_Update_EventName,
+} from '../constant'
 import preferences from '@ohos.data.preferences'
 import { DefaultUserList, UserInfoModel, CurrentUser } from '../models/user'
 import { MessageInfoModel } from '../models/message'
 import { emitter } from '@kit.BasicServicesKit'
+import { FileCommon } from './file_operate'
 
 export class WeChatStore {
   static context: Context
@@ -32,6 +38,7 @@ export class WeChatStore {
 
   // 获取某个人的整个的聊天记录
   static getWeChatMessage(userId: string) {
+
     const store = WeChatStore.getWeChatMessageStore(userId)
     const allRecord = store.getAllSync() as object
     if (allRecord) {
@@ -45,6 +52,13 @@ export class WeChatStore {
 
   // 删除某个人整个的聊天记录
   static async delWeChatMessage(userId: string) {
+    // 检测是否有引用文件 如果有全部删除
+    const list = WeChatStore.getWeChatMessage(userId)
+    list.forEach(item => {
+      if (item.sourceFilePath) {
+        FileCommon.delFilePath(item.sourceFilePath) //删除所有有关的文件引用
+      }
+    })
     preferences.deletePreferences(getContext(), {
       name: `${WeChat_UserRecordKey}_${userId}`
     })

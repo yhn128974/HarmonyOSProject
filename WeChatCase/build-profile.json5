@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\Lenovo\\.ohos\\config\\default_WeChatCase_Zvysuwxudo0n63iwadv4tBwQgsa__PPw7Yz_PIAOZSY=.cer",
+          "storePassword": "0000001B569C7F5C49050F0169AC18B7F2F309DD58E2D30D4C9B624F5FC1B09CC73FFAE0C134AA8DE4DD40",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BD24531B49515EAF039FD8955437343197ABBE6E57142B383F282238C6603B21B84139D876911AD",
+          "profile": "C:\\Users\\Lenovo\\.ohos\\config\\default_WeChatCase_Zvysuwxudo0n63iwadv4tBwQgsa__PPw7Yz_PIAOZSY=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\Lenovo\\.ohos\\config\\default_WeChatCase_Zvysuwxudo0n63iwadv4tBwQgsa__PPw7Yz_PIAOZSY=.p12"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
