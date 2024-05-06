@@ -1,5 +1,6 @@
 import { TabBarClass } from '../models/tab'
 import { UserInfo, UserInfoModel, DefaultUserList } from '../models/user'
+import Location from './ChatDetail/Components/Location'
 import { Connect } from './Connect/Connect'
 import WeChat from './WeChat/WeChat'
 
@@ -61,9 +62,7 @@ struct Index {
           } else if (item.name == 'connect') {
             Connect()
           } else if (item.name == 'discover') {
-            TextInput({
-              placeholder: '请输入内容'
-            })
+
           } else {
 
           }

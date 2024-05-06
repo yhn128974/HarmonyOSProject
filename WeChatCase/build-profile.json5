@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Lenovo\\.ohos\\config\\default_WeChatCase_Zvysuwxudo0n63iwadv4tBwQgsa__PPw7Yz_PIAOZSY=.cer",
-          "storePassword": "0000001B569C7F5C49050F0169AC18B7F2F309DD58E2D30D4C9B624F5FC1B09CC73FFAE0C134AA8DE4DD40",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001BD24531B49515EAF039FD8955437343197ABBE6E57142B383F282238C6603B21B84139D876911AD",
-          "profile": "C:\\Users\\Lenovo\\.ohos\\config\\default_WeChatCase_Zvysuwxudo0n63iwadv4tBwQgsa__PPw7Yz_PIAOZSY=.p7b",
+          "storePassword": "0000001CC6DE42FAC9BC4ED35DEEAEA1B395B19E96908DA959EB6352439970145AE83E52E2A96ABFF9277751",
+          "certpath": "C:/Users/Lenovo/Desktop/HarmonyOS/certificate/longyouWechat.cer",
+          "keyAlias": "longyou",
+          "keyPassword": "0000001C554187A64C87A941587AA2D65945C4AB3BF9EBA1EDA0502F887FA8EF8691C5447837B40588B6C1A2",
+          "profile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificate/longyou_wechatDebug.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Lenovo\\.ohos\\config\\default_WeChatCase_Zvysuwxudo0n63iwadv4tBwQgsa__PPw7Yz_PIAOZSY=.p12"
+          "storeFile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificate/.p12"
         }
       }
     ],

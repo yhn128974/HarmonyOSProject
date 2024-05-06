@@ -12,17 +12,18 @@ import { WeChatStore } from '../../utils/chat_store';
 import { AudioRenderer } from '../../utils/audio_renderer';
 import { AvPlayer } from '../../utils/av_player';
 import PreviewImag from './Components/previewDialog'
+import Location from './Components/Location';
 
 @Entry
 @Component
 struct ChatDetail {
   //////////////////////////////////////////图片预览
-  showType:MessageTypeEnum=MessageTypeEnum.IMAGE
+  showType: MessageTypeEnum = MessageTypeEnum.IMAGE
   previewUrl: string = ''
   previewController: CustomDialogController = new CustomDialogController({
     builder: PreviewImag({
       url: this.previewUrl,
-      showTyPe:this.showType,
+      showTyPe: this.showType,
 
     }),
     customStyle: true,
@@ -160,6 +161,7 @@ struct ChatDetail {
       }
 
       Column() {
+
         List({
           space: 20,
           scroller: this.scroller
@@ -173,8 +175,8 @@ struct ChatDetail {
                 },
                 previewImage: () => {
                   this.previewUrl = "file://" + item.sourceFilePath
-                  this.previewController.open()//打开预览
-                  this.showType=item.messageType
+                  this.previewController.open() //打开预览
+                  this.showType = item.messageType
                 }
               })
             }

@@ -16,6 +16,7 @@ import { util } from '@kit.ArkTS'
 import cameraPicker from '@ohos.multimedia.cameraPicker';
 import camera from '@ohos.multimedia.camera';
 import { BusinessError } from '@ohos.base';
+import Location from './Location'
 
 let mContext = getContext(this) as common.Context;
 
@@ -26,6 +27,7 @@ struct BottomInput {
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Consume talkUser: UserInfoModel
   @State showVoice: boolean = false //是否显示语音输入
+  @State showLoaction: boolean = false
   @State content: string = '' //输入内容
   @State isShowVoiceBuilder: boolean = false
   @Provide
@@ -36,6 +38,7 @@ struct BottomInput {
   tempAudioPath: string = ""
   duration: number = 0 //音频的秒数
   timer: number = -1 //定时器的标记
+  @State currentAddress: string = ""
   @State
   bottomList: PopupItem[] = [
     {
@@ -50,14 +53,20 @@ struct BottomInput {
     {
       icon: $r('app.media.ic_public_carema'),
       title: '拍摄',
-
+      itemClick: () => {
+        this.openCamera()
+      }
     },
     {
       icon: $r('app.media.ic_statusbar_gps'),
       title: '位置',
+      // 弹出一个地图组件
       itemClick: () => {
-        this.openCamera()
+        this.showLoaction = true
+
       }
+
+
     },
     {
       icon: $r('app.media.ic_public_voice'),
@@ -103,6 +112,49 @@ struct BottomInput {
     Column() {
       VoiceInput()
     }
+  }
+
+  @Builder
+  getLocation() {
+    // 放置地图组件
+    Stack({
+      alignContent: Alignment.Top
+    }) {
+      Location({
+        currentAddress: this.currentAddress
+      })
+      Row() {
+        Text('取消').fontColor($r('app.color.text_second')).onClick(() => {
+          this.showLoaction = false
+        })
+        Button('确定')
+          .type(ButtonType.Normal)
+          .borderRadius(4)
+          .backgroundColor($r('app.color.primary'))
+          .height(30)
+          .width(60)
+          .onClick(() => {
+            //   拿到子组件的值 ,将这个值传递发送消息
+            if (this.currentAddress) {
+              this.sentTextMessage(this.currentAddress)
+            }
+            this.currentAddress = ""
+            this.showLoaction = false
+          })
+
+      }
+      .justifyContent(FlexAlign.SpaceBetween)
+      .width('100%')
+      .padding({
+        left: 20,
+        right: 20
+      })
+      .height(60)
+      .margin({
+        top: 50
+      })
+    }
+
   }
 
   @Builder
@@ -415,7 +467,8 @@ struct BottomInput {
         this.isShowVoiceBuilder,
         this.VoiceBuilder(),
         // 配置参数
-        { modalTransition: ModalTransition.NONE })
+        { modalTransition: ModalTransition.NONE }
+      )
 
       if (this.showBottomCard) {
         Column() {
@@ -431,7 +484,7 @@ struct BottomInput {
         }.backgroundColor($r('app.color.second_back_color'))
       }
 
-    }
+    }.bindContentCover(this.showLoaction, this.getLocation())
   }
 }
 
