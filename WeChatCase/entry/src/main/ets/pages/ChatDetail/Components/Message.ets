@@ -54,12 +54,12 @@ export struct Message {
       title: '提醒',
       icon: $r("app.media.ic_public_warin")
     }]
+  videoController: VideoController = new VideoController()
   // 删除信息的方法
   delMessage: (messId: string) => void = () => {
   }
   //   预览方法
   previewImage: () => void = () => {
-
   }
 
   @Builder
@@ -179,6 +179,41 @@ export struct Message {
     })
   }
 
+  @Builder
+  getVideoContent() {
+    Column() {
+      Stack() {
+        Video({
+          src: "file://" + this.currentMessage.sourceFilePath,
+          controller: this.videoController
+        })
+          .width(100)
+          .height(100)
+          .controls(false)
+          .borderRadius(4)
+          .onPrepared(() => {
+            this.videoController.setCurrentTime(0.1) //通过控制器播放到0.1的位置
+            //   截图能力
+            //   HMS解析封面
+          })
+
+        //   video 不同与image，不会自适应
+        Image($r('app.media.ic_public_play'))
+          .width(30)
+          .height(30)
+          .fillColor($r("app.color.back_color"))
+
+      }
+
+    }.margin({
+      left: 10,
+      right: 10
+    })
+    .onClick(() => {
+      this.previewImage()
+    })
+  }
+
   build() {
     Row() {
       Image(this.currentMessage.sendUser.avatar).width(40).aspectRatio(1).borderRadius(4)
@@ -193,6 +228,10 @@ export struct Message {
           if (this.currentMessage.messageType === MessageTypeEnum.IMAGE) {
             this.getImageContent()
           }
+          if (this.currentMessage.messageType === MessageTypeEnum.VIDEO) {
+            this.getVideoContent()
+          }
+
         } // 添加弹层
         .bindPopup(this.showPopup, {
           builder: this.getContent(),

@@ -4,7 +4,7 @@ import { UserInfo, UserInfoModel } from '../../models/user';
 import BottomInput from './Components/BottomInput'
 import { Message } from './Components/Message'
 
-import { MessageInfo, MessageInfoModel } from '../../models/message'
+import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../models/message'
 import { promptAction } from '@kit.ArkUI';
 import { getRequestMessage } from '../../utils/request'
 import { ChatResponse, ChatResponseModel } from '../../models/chat';
@@ -17,10 +17,13 @@ import PreviewImag from './Components/previewDialog'
 @Component
 struct ChatDetail {
   //////////////////////////////////////////图片预览
+  showType:MessageTypeEnum=MessageTypeEnum.IMAGE
   previewUrl: string = ''
   previewController: CustomDialogController = new CustomDialogController({
     builder: PreviewImag({
-      url: this.previewUrl
+      url: this.previewUrl,
+      showTyPe:this.showType,
+
     }),
     customStyle: true,
     autoCancel: false
@@ -171,6 +174,7 @@ struct ChatDetail {
                 previewImage: () => {
                   this.previewUrl = "file://" + item.sourceFilePath
                   this.previewController.open()//打开预览
+                  this.showType=item.messageType
                 }
               })
             }

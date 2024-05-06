@@ -19,7 +19,6 @@ import { BusinessError } from '@ohos.base';
 
 let mContext = getContext(this) as common.Context;
 
-
 @Preview
 @Component
 struct BottomInput {
@@ -46,7 +45,6 @@ struct BottomInput {
       itemClick: () => {
         this.sendPhoto()
       }
-
 
     },
     {
@@ -145,21 +143,29 @@ struct BottomInput {
     ], {
       cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK//后置摄像头
     })
-    if (result.mediaType === cameraPicker.PickerMediaType.PHOTO) {
-      const file = fileIo.openSync(result.resultUri, fileIo.OpenMode.READ_ONLY)
-      const filePath = getContext().filesDir + '/' + util.generateRandomUUID() + 'jpg'
-      fileIo.copyFileSync(file.fd, filePath)
-      fileIo.closeSync(file.fd)
 
-      this.sendImageMessage([new MessageInfoModel({
-        connectUser: this.talkUser,
-        sendUser: this.currentUser,
-        sourceFilePath: filePath,
-        messageType: MessageTypeEnum.IMAGE,
-        messageContent: "[图片]"
-      } as MessageInfo)])
-
+    const filePath = getContext().filesDir + '/' + util.generateRandomUUID()
+    const file = fileIo.openSync(result.resultUri, fileIo.OpenMode.READ_ONLY)
+    let extendName = 'jpg'
+    let messTpye = MessageTypeEnum.IMAGE
+    let messContent = '[图片]'
+    // 注意系统GUB,类型判断不上
+    if (result.mediaType === 'video') {
+      extendName = 'mp4'
+      messTpye = MessageTypeEnum.VIDEO
+      messContent = '[视频]'
     }
+    // 考培文件
+    fileIo.copyFileSync(file.fd, filePath + extendName)
+    fileIo.closeSync(file.fd)
+    this.sendImageMessage([new MessageInfoModel({
+      connectUser: this.talkUser,
+      sendUser: this.currentUser,
+      sourceFilePath: filePath + extendName,
+      messageType: messTpye,
+      messageContent: messContent
+    } as MessageInfo)])
+
     AlertDialog.show({
       message: JSON.stringify(result)
     })
@@ -258,7 +264,6 @@ struct BottomInput {
     AudioCapturer.stop()
     if (this.voiceState === VoiceRecordEnum.Cancel) {
       //   取消发生
-
       FileCommon.delFilePath(this.tempAudioPath) //删除文件
       this.duration = 0
     }
