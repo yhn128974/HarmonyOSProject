@@ -1,12 +1,13 @@
 import { audio } from '@kit.AudioKit'
 import { fileIo } from '@kit.CoreFileKit'
+import { emitter } from '@kit.BasicServicesKit'
 
 export default class AudioCapturer {
   // 声明一个采音对象的单例对象
   static audioCapturer: audio.AudioCapturer
   // 录用配置
   static audioStreamInfo: audio.AudioStreamInfo = {
-    samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_44100,
+    samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_16000,
     channels: audio.AudioChannel.CHANNEL_1,
     sampleFormat: audio.AudioSampleFormat.SAMPLE_FORMAT_S16LE,
     encodingType: audio.AudioEncodingType.ENCODING_TYPE_RAW
@@ -46,6 +47,11 @@ export default class AudioCapturer {
           length: buffer.byteLength
         };
         fileIo.writeSync(fd, buffer, options) // 写入文件
+
+        emitter.emit("onBuffer",{data:{
+          buffer
+        }})
+
         bufferSize += buffer.byteLength//偏移量
       }
     } catch (error) {

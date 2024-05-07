@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/Index",
+    "pages/VodeTest",
     "pages/ChatDetail/ChatDetail"
   ]
 }

@@ -1,19 +1,54 @@
 import { VoiceRecordEnum } from '../../../models/voice'
+import { emitter } from '@kit.BasicServicesKit'
 
 @Component
 struct VoiceInput {
   @Consume
   voiceState: VoiceRecordEnum
+  @Consume asrResult: string
+  @State list: number[] = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10] //用来生成高度的数组
+
+  aboutToAppear(): void {
+    emitter.on('onBuffer', (res) => {
+      this.calCHeight(res.data!.buffer)
+    })
+  }
+
+  aboutToDisappear(): void {
+    emitter.off('onBuffer')
+  }
+
+  // 计算 20个高度个list
+  calCHeight(buffer: ArrayBuffer) {
+    // buffer的长度不确定
+    // z做一个转化,将buffer转化为dateView
+    const view = new DataView(buffer)
+    const arr: number[] = []
+    const size = Math.floor(buffer.byteLength / 20) //分三十分,每份的大小
+    for (let index = 0; index < buffer.byteLength; index += size) {
+      let sum = 0
+      //   计算每一份里面振幅的平均值
+      for (let index2 = index; index2 < index + size; index2 += 2) {
+        //   取值
+        const sample = view.getInt16(index2, true)
+        sum += Math.abs(sample)
+      }
+      const height = 120 * sum / (size / 2) / 32767 //比例 某一份的高度
+      arr.push(height < 10 ? 10 : height)
+    }
+    this.list = arr
+  }
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
       Column() {
         // 显示关闭和文本
-
         Row() {
           if (this.voiceState === VoiceRecordEnum.Cancel) {
             //  取消录音
-            Row() {
+            Row({
+              space: 2
+            }) {
 
             }
             .width(100)
@@ -27,7 +62,7 @@ struct VoiceInput {
           } else if (this.voiceState === VoiceRecordEnum.Transfer) {
             // 语音转文本
             Row() {
-
+              Text(this.asrResult).fontSize(18).fontColor($r('app.color.text_primary'))
             }
             .width(280)
             .height(120)
@@ -39,9 +74,16 @@ struct VoiceInput {
 
           } else if (this.voiceState === VoiceRecordEnum.Recording) {
             //录音
-            Row() {
-
+            Row({ space: 2 }) {
+              ForEach(this.list, (value: number) => {
+                Row()
+                  .height(value)
+                  .width(2)
+                  .borderRadius(1)
+                  .backgroundColor($r('app.color.animate_voice_color'))
+              })
             }
+            .justifyContent(FlexAlign.Center)
             .width(180)
             .height(80)
             .borderRadius(20)

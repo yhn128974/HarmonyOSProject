@@ -5,6 +5,7 @@ import { promptAction } from '@kit.ArkUI'
 import { PopupItem } from '../../../models/popup'
 import { AudioRenderer } from '../../../utils/audio_renderer'
 import { FileCommon } from '../../../utils/file_operate'
+import { VoiceTransfer } from '../../../utils/VoiceTransfer'
 
 @Preview
 @Component
@@ -17,6 +18,7 @@ export struct Message {
   // 判断消息的主体是否为自己
   @State isOwnMessage: boolean = this.currentUser.user_id === this.currentMessage?.sendUser?.user_id
   @State showPopup: boolean = false
+  @State transferResult: string = '' //记录转化的文字
   // 弹框数据
   @State
   popupList: PopupItem[] = [
@@ -30,7 +32,15 @@ export struct Message {
     },
     {
       title: '转文字',
-      icon: $r("app.media.ic_public_trans_text")
+      icon: $r("app.media.ic_public_trans_text"),
+      itemClick: () => {
+        //点击转化为文字
+        if (this.currentMessage.messageType == -MessageTypeEnum.AUDIO) {
+          VoiceTransfer.VoiceToText(this.currentMessage.sourceFilePath, (res) => {
+            this.transferResult = res.result //拿到转化的文字
+          })
+        }
+      }
     },
     {
       title: '删除',
@@ -64,6 +74,7 @@ export struct Message {
 
   @Builder
   getContent() {
+
     GridRow({ columns: 5 }) {
       ForEach(this.popupList, (item: PopupItem) => {
         GridCol() {
@@ -110,54 +121,69 @@ export struct Message {
 
   @Builder
   getAudioContent() {
-    Row({
-      space: 5
-    }) {
-      Text(`${this.currentMessage.sourceDuration}'`).fontColor($r('app.color.text_primary'))
+    Column() {
+      Row({
+        space: 5
+      }) {
+        Text(`${this.currentMessage.sourceDuration}'`).fontColor($r('app.color.text_primary'))
 
-      // Image($r('app.media.ic_public_recorder')).width(20).aspectRatio(1).rotate({
-      //   angle: this.isOwnMessage ? 180 : 0
-      // })
+        // Image($r('app.media.ic_public_recorder')).width(20).aspectRatio(1).rotate({
+        //   angle: this.isOwnMessage ? 180 : 0
+        // })
 
-      ImageAnimator()
-        .images([
-          {
-            src: $r('app.media.ic_public_voice3')
-          },
-          {
-            src: $r('app.media.ic_public_voice1')
-          },
-          {
-            src: $r('app.media.ic_public_voice2')
-          },
-          {
-            src: $r('app.media.ic_public_voice3')
-          },
-        ])
-        .state(this.audioState)
-        .reverse(true)
-        .iterations(-1)
-        .width(20)
-        .aspectRatio(1)
-        .rotate({
-          angle: this.isOwnMessage ? 180 : 0
-        })
+        ImageAnimator()
+          .images([
+            {
+              src: $r('app.media.ic_public_voice3')
+            },
+            {
+              src: $r('app.media.ic_public_voice1')
+            },
+            {
+              src: $r('app.media.ic_public_voice2')
+            },
+            {
+              src: $r('app.media.ic_public_voice3')
+            },
+          ])
+          .state(this.audioState)
+          .reverse(true)
+          .iterations(-1)
+          .width(20)
+          .aspectRatio(1)
+          .rotate({
+            angle: this.isOwnMessage ? 180 : 0
+          })
+      }
+      .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
+      .padding(10)
+      .margin({
+        left: 10,
+        right: 10
+      })
+      .borderRadius(4)
+      .width(this.getAudioWidth())
+      .direction(this.isOwnMessage ? Direction.Rtl : Direction.Ltr)
+      .onClick(() => {
+        AudioRenderer.start(this.currentMessage.sourceFilePath, () => {
+          this.audioState = AnimationStatus.Stopped
+        }) //播放
+        this.audioState = AnimationStatus.Running
+      })
+
+      if (this.transferResult) {
+        Text(this.transferResult)
+          .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
+          .fontColor($r('app.color.text_primary'))
+          .padding(10)
+          .margin({
+            left: 10,
+            right: 10
+          })
+          .borderRadius(4)
+      }
     }
-    .backgroundColor(this.isOwnMessage ? $r('app.color.second_primary') : $r('app.color.white'))
-    .padding(10)
-    .margin({
-      left: 10,
-      right: 10
-    })
-    .borderRadius(4)
-    .width(this.getAudioWidth())
-    .direction(this.isOwnMessage ? Direction.Rtl : Direction.Ltr)
-    .onClick(() => {
-      AudioRenderer.start(this.currentMessage.sourceFilePath, () => {
-        this.audioState = AnimationStatus.Stopped
-      }) //播放
-      this.audioState = AnimationStatus.Running
-    })
+
   }
 
   @Builder

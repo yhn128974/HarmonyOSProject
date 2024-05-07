@@ -13,6 +13,7 @@ import { AudioRenderer } from '../../utils/audio_renderer';
 import { AvPlayer } from '../../utils/av_player';
 import PreviewImag from './Components/previewDialog'
 import Location from './Components/Location';
+import { VoiceTransfer } from '../../utils/VoiceTransfer';
 
 @Entry
 @Component
@@ -108,7 +109,7 @@ struct ChatDetail {
     // 根据输入内容发生请求
     const result = await getRequestMessage(content)
     let newMessageInfoModel = new MessageInfoModel({
-      messageContent: result.data?.info?.text,
+      messageContent: result?.data?.info?.text,
       sendUser: this.talkUser,
       connectUser: this.talkUser,
     } as MessageInfo)
@@ -116,8 +117,10 @@ struct ChatDetail {
     // 添加聊天记录到首选项中
     WeChatStore.addOneWeChatMessage(this.talkUser.user_id, newMessageInfoModel)
     this.talkUserInputIng = false
-    //
+    //滚动屏幕
     this.scroller.scrollEdge(Edge.Bottom)
+    //   用小艺播出
+    VoiceTransfer.textToVoice(result?.data?.info?.text) //
   }
 
   // 发送图片消息的方法

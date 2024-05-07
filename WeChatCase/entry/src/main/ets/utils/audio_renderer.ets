@@ -7,8 +7,8 @@ export class AudioRenderer {
   static renderModel: audio.AudioRenderer
   // 采样配置
   static audioStreamInfo: audio.AudioStreamInfo = {
-    samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_44100,
-    channels: audio.AudioChannel.CHANNEL_2,
+    samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_16000,
+    channels: audio.AudioChannel.CHANNEL_1,
     sampleFormat: audio.AudioSampleFormat.SAMPLE_FORMAT_S16LE,
     encodingType: audio.AudioEncodingType.ENCODING_TYPE_RAW
   };

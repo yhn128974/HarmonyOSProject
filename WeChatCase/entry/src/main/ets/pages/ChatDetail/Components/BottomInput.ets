@@ -17,12 +17,14 @@ import cameraPicker from '@ohos.multimedia.cameraPicker';
 import camera from '@ohos.multimedia.camera';
 import { BusinessError } from '@ohos.base';
 import Location from './Location'
+import { VoiceTransfer } from '../../../utils/VoiceTransfer'
 
 let mContext = getContext(this) as common.Context;
 
 @Preview
 @Component
 struct BottomInput {
+  @Provide asrResult:string=''
   @StorageProp(WeChat_CurrentUserKey)
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Consume talkUser: UserInfoModel
@@ -94,6 +96,8 @@ struct BottomInput {
     }]
   @State
   showBottomCard: boolean = false // 显示底部
+
+
   // 发送文本
   sentTextMessage: (content: string) => void = () => {
   }
@@ -411,6 +415,10 @@ struct BottomInput {
                       this.voiceState = VoiceRecordEnum.Cancel
                     } else {
                       this.voiceState = VoiceRecordEnum.Transfer
+                      VoiceTransfer.VoiceToText(this.tempAudioPath,(res)=>{
+                        this.asrResult=res.result //
+
+                      })
                     }
                   }
                 })
