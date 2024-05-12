@@ -5,6 +5,9 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": {}
+  "dependencies": {
+    "basic": "file:../../commons/basic/build/default/outputs/default/basic.har"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
 }
-
