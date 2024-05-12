@@ -3,13 +3,61 @@ import { WeChatStore } from '../../utils/chat_store'
 import { router } from '@kit.ArkUI'
 import { emitter } from '@kit.BasicServicesKit'
 import { Record_Update_EventName } from '../../constant'
+import { PopupItem } from '../../models/popup'
+import { scanCore, scanBarcode } from '@kit.ScanKit';
+// 导入默认界面需要的日志模块和错误码模块
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 @Component
 export default struct WeChat {
   @State list: MessageInfoModel[] = []
+  @State
+  popList: PopupItem[] = [
+    {
+      title: '发起群聊',
+      icon: $r('app.media.ic_public_message')
+    },
+    {
+      title: '添加朋友',
+      icon: $r('app.media.ic_public_add_friend')
+    },
+    {
+      title: '扫一扫',
+      icon: $r('app.media.ic_public_scan'),
+      itemClick: () => {
+        this.scan()
+      }
+    },
+    {
+      title: '收付款',
+      icon: $r('app.media.ic_public_receive'),
+      itemClick: () => {
+        router.pushUrl({
+          url: 'pages/PayQrCode/PayQrCode'
+        })
+      }
+    }
+  ]
+  @State showDropDown: boolean = false
 
   aboutToAppear(): void {
     this.getAllRecord()
+  }
+
+  scan() {
+    // 定义扫码参数options
+    let options: scanBarcode.ScanOptions = {
+      scanTypes: [scanCore.ScanType.ALL],
+      enableMultiMode: true,
+      enableAlbum: true
+    };
+    // 扫码
+    scanBarcode.startScanForResult(getContext(this), options, (error: BusinessError, result: scanBarcode.ScanResult) => {
+      // 收到扫码结果后返回
+      hilog.info(0x0001, '[Scan CPSample]', 'Callback scan result: %{public}s', JSON.stringify(result));
+    })
+
   }
 
   async getAllRecord() {
@@ -54,10 +102,61 @@ export default struct WeChat {
     })
   }
 
+  @Builder
+  getDropDown() {
+    Column() {
+      ForEach(this.popList, (item: PopupItem) => {
+        Row({
+          space: 3
+        }) {
+          Image(item.icon)
+            .width(20)
+            .aspectRatio(1)
+            .fillColor($r('app.color.white'))
+          Text(item.title)
+            .layoutWeight(1)
+            .fontColor($r('app.color.white'))
+            .textAlign(TextAlign.Center)
+        }
+        .padding({
+          left: 10,
+          right: 10
+        })
+        .height(50)
+        .justifyContent(FlexAlign.Center)
+        .onClick(() => {
+          item.itemClick && item.itemClick()
+        })
+      })
+    }.width(120)
+  }
+
   build() {
     Column() {
       Row() {
         Text('微信')
+        Image($r('app.media.ic_public_add_norm'))
+          .width(20)
+          .aspectRatio(1)
+          .position({
+            x: '100%'
+          })
+          .translate({
+            x: '-40',
+            y: 15
+          })
+          .bindPopup(this.showDropDown, {
+            builder: this.getDropDown(),
+            onStateChange: (event) => {
+              // 当点击空白区域时 回触发
+              this.showDropDown = event.isVisible
+            },
+            backgroundBlurStyle: BlurStyle.NONE,
+            popupColor: $r('app.color.popup_back')
+          })
+          .onClick(() => {
+            this.showDropDown = true
+          })
       }
       .justifyContent(FlexAlign.Center)
       .width('100%')

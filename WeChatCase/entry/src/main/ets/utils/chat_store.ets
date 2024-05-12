@@ -18,6 +18,13 @@ export class WeChatStore {
     return preferences.getPreferences(WeChatStore.context || getContext(), weChat_StoreKey)
   }
 
+  // 给每个聊天对应的userId记录创建store
+  static getWeChatMessageStore(userId: string) {
+    return preferences.getPreferencesSync(getContext(), {
+      name: `${WeChat_UserRecordKey}_${userId}`
+    })
+  }
+
   // 获取微信联系人
   static async getWeChatConnect() {
     const store = await WeChatStore.getWeChatStore()
@@ -30,15 +37,8 @@ export class WeChatStore {
     return JSON.parse(store.getSync(WeChat_CurrentUserKey, JSON.stringify(CurrentUser)) as string) as UserInfoModel
   }
 
-  static getWeChatMessageStore(userId: string) {
-    return preferences.getPreferencesSync(getContext(), {
-      name: `${WeChat_UserRecordKey}_${userId}`
-    })
-  }
-
   // 获取某个人的整个的聊天记录
   static getWeChatMessage(userId: string) {
-
     const store = WeChatStore.getWeChatMessageStore(userId)
     const allRecord = store.getAllSync() as object
     if (allRecord) {

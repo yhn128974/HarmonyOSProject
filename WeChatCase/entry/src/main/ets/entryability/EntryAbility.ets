@@ -15,14 +15,13 @@ export default class EntryAbility extends UIAbility {
       "ohos.permission.LOCATION",
       "ohos.permission.APPROXIMATELY_LOCATION"]
     )
-
   }
 
   onDestroy(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
@@ -31,7 +30,9 @@ export default class EntryAbility extends UIAbility {
     const userList = WeChatStore.getWeChatConnect()
 
     //将当前用户放入内存中
-    const user = JSON.parse(JSON.stringify(WeChatStore.getCurrentUser())) as UserInfoModel
+    const user = await WeChatStore.getCurrentUser()
+
+
     AppStorage.setOrCreate<UserInfoModel>(WeChat_CurrentUserKey, user)
 
     windowStage.loadContent('pages/Index', (err) => {

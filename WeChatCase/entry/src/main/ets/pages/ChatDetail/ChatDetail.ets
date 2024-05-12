@@ -141,8 +141,6 @@ struct ChatDetail {
       if (index > -1) {
         this.messageList.splice(index, 1)
       }
-
-
       // 再移除首选项的数据
       WeChatStore.delOneWeChatMessage(this.talkUser.user_id, messId)
     }
@@ -185,6 +183,8 @@ struct ChatDetail {
             }
           })
         }.onAppear(() => {
+          this.scroller.scrollEdge(Edge.End)
+        }).onAreaChange(()=>{
           this.scroller.scrollEdge(Edge.End)
         })
       }
