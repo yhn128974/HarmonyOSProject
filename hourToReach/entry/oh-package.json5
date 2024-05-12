@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "basic": "file:../../commons/basic/build/default/outputs/default/basic.har"
+    "basic":"file:../commons/basic"
   },
   "devDependencies": {},
   "dynamicDependencies": {}
