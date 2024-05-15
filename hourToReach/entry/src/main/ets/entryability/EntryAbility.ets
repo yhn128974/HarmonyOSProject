@@ -48,7 +48,7 @@ export default class EntryAbility extends UIAbility {
         hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
       });
     }else {
-      windowStage.loadContent('pages/Login/index')
+      windowStage.loadContent('pages/Login/Login')
     }
 
 
