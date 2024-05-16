@@ -1,10 +1,16 @@
+import { handleLogin } from '../../common/api/user'
 import { User, UserModel } from '../../common/models'
+import { promptAction, router } from '@kit.ArkUI'
+import { TokenStore, TOKEN_KEY } from 'basic/Index'
 
 @Entry
 @Component
 struct Login {
   @State loading: boolean = false
-  @State thisUserCount: UserModel = new UserModel({} as User)
+  @State thisUserCount: UserModel = new UserModel({
+    "account": "longyou",
+    "password": "yuhaonan2048"
+  })
 
   @Styles
   loginStyle() {
@@ -13,6 +19,21 @@ struct Login {
     .width('100%')
     .height(58)
     .borderRadius(0)
+  }
+
+  async login() {
+    this.loading = true
+    const result = await handleLogin(this.thisUserCount)
+    promptAction.showToast({
+      message: result
+    })
+    await TokenStore.setToken(result)
+    await AppStorage.setOrCreate(TOKEN_KEY, result)
+    this.loading = false
+    router.replaceUrl({
+      url: "pages/Index"
+    })
+
   }
 
   build() {
@@ -52,7 +73,10 @@ struct Login {
           Text('登录').fontColor($r('app.color.white'))
         }
       }
-      .backgroundColor( $r('app.color.primary') )
+      .onClick(() => {
+        this.login()
+      })
+      .backgroundColor($r('app.color.primary'))
       .width('100%')
       .height(50)
       .margin({ top: 50 })

@@ -2,8 +2,10 @@ import { preferences } from '@kit.ArkData'
 import { TOKEN_KEY, TOKEN_STORE_KEY } from '../constants'
 
 export class TokenStore {
-  static async getStore() {
-    return await preferences.getPreferencesSync(getContext(), { name: TOKEN_STORE_KEY })
+  static context: Context
+
+  static  getStore() {
+    return  preferences.getPreferencesSync(TokenStore.context || getContext(), { name: TOKEN_STORE_KEY })
   }
 
   static async getToken() {
