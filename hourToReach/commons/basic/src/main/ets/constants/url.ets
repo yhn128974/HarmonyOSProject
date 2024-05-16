@@ -1,0 +1,1 @@
+export const BASE_URL = 'https://slwl-api.itheima.net'  // 请求基础地址

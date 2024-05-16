@@ -1,5 +1,7 @@
 {
   "src": [
-    "testability/pages/Index"
+    "pages/Index",
+    "pages/Login/Login",
+    "pages/Advert/start"
   ]
 }
