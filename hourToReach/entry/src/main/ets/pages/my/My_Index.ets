@@ -1,20 +1,40 @@
 import { HMCard, HMCard_item } from 'basic'
+import { getUserInfo } from '../../common/api'
+import { UserInfo, UserInfoModel, } from '../../common/models'
+import { promptAction } from '@kit.ArkUI'
 
 @Entry
 @Component
 export default struct My_index {
-  @State message: string = 'Hello World';
+  @State currentUserInfo: UserInfoModel = new UserInfoModel({} as UserInfo)
+  @Consume
+  @Watch('handleFocused')
+  currentName: string
+
+  aboutToAppear(): void {
+    this.handleUserInfo()
+  }
+
+  handleFocused() {
+    this.handleUserInfo()
+  }
+
+
+  async handleUserInfo() {
+    this.currentUserInfo = await getUserInfo()
+  }
 
   build() {
     Column() {
       // 基本信息
       Column() {
-        Image($r("app.media.ic_avatar_driver"))
+        Image(this.currentUserInfo.avatar || $r('app.media.ic_avatar_driver'))
           .width(67)
           .height(67)
           .borderRadius(34.5)
           .backgroundColor($r('app.color.white'))
-        Text("司机")
+
+        Text(this.currentUserInfo.name)
           .fontSize(18)
           .fontWeight(600)
           .lineHeight(25)
@@ -23,8 +43,13 @@ export default struct My_index {
             bottom: 9
           })
           .fontColor($r('app.color.white'))
-        Text(`司机编号: 66666666`).fontSize(14).fontWeight(400).lineHeight(20).fontColor($r('app.color.white'))
-        Text(`手机号: 66666666`)
+
+        Text(`司机编号:${this.currentUserInfo.number}`)
+          .fontSize(14)
+          .fontWeight(400)
+          .lineHeight(20)
+          .fontColor($r('app.color.white'))
+        Text(`手机号:${this.currentUserInfo.phone}`)
           .fontSize(14)
           .fontWeight(400)
           .lineHeight(20)

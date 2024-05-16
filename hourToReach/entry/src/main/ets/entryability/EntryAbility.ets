@@ -37,10 +37,9 @@ export default class EntryAbility extends UIAbility {
 
     TokenStore.context = this.context
     let token = await TokenStore.getToken()
-
+    await AppStorage.setOrCreate(TOKEN_KEY, token)
 
     if (token) {
-      await AppStorage.setOrCreate(TOKEN_KEY, token)
       // Main window is created, set main page for this ability
       windowStage.loadContent('pages/Index', (err) => {
         if (err.code) {

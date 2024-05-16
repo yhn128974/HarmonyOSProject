@@ -1,1 +1,1 @@
-import {handleLogin} from './user'
+export  {handleLogin,getUserInfo} from './user'

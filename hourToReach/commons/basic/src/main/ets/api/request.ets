@@ -24,7 +24,7 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
       extraData: method !== http.RequestMethod.GET ? data : "", // 当请求类型不等于get时 复制
       header: {
         "Content-Type": "application/json",
-        Authorization: AppStorage.get(TOKEN_KEY) || "", // 设置请求头的token 每个接口都有
+        Authorization: AppStorage.get(TOKEN_KEY) as string|| "", // 设置请求头的token 每个接口都有
       },
       method,
       readTimeout: 10000 // 如果多少秒没响应就断开

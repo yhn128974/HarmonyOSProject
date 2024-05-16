@@ -1,8 +1,12 @@
-import { Request } from 'basic/Index'
-import { UserModel } from '../models'
+import { Request } from 'basic'
+import { UserModel, UserInfoModel } from '../models'
 
 
 export function handleLogin(account: UserModel) {
-  return Request.post<string>('/driver/login/account', account)
+  return Request.post<string>('/login/account', account)
 }
 
+// 获取用户信息
+export function getUserInfo() {
+  return Request.get<UserInfoModel>("/users")
+}
