@@ -1,24 +1,54 @@
 import { HMCard, HMCard_item } from 'basic'
-import { getUserInfo } from '../../common/api'
-import { UserInfo, UserInfoModel, } from '../../common/models'
-import { promptAction } from '@kit.ArkUI'
+import { getUserInfo, getMissionInfo } from '../../common/api'
+import {
+  UserInfo,
+  UserInfoModel,
+  UserTaskInfo,
+  DailyMileage,
+  UserTaskInfoParams,
+  UserTaskInfoModel,
+  DailyMileageModel,
+  UserTaskInfoParamsModel
+} from '../../common/models'
+import { promptAction, router } from '@kit.ArkUI'
 
 @Entry
 @Component
 export default struct My_index {
+  //任务信息
+  @State
+  currentUserTaskInfo: UserTaskInfoModel = new UserTaskInfoModel({} as UserTaskInfo)
+  // 时间参数
+  @State
+  currentUserTaskInfoParam: UserTaskInfoParamsModel = new UserTaskInfoParamsModel({} as UserTaskInfoParams)
+  // 用户信息
   @State currentUserInfo: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Consume
   @Watch('handleFocused')
   currentName: string
 
   aboutToAppear(): void {
+    this.handleCurrentUserTaskInfoParam()
     this.handleUserInfo()
+    this.handleMissionInfo()
+  }
+
+  handleCurrentUserTaskInfoParam() {
+    let currentDate = new Date
+    this.currentUserTaskInfoParam.year = currentDate.getFullYear().toString()
+    this.currentUserTaskInfoParam.month = (currentDate.getMonth() + 1).toString()
   }
 
   handleFocused() {
-    this.handleUserInfo()
+    if (this.currentName = 'my') {
+      this.handleCurrentUserTaskInfoParam()
+      this.handleMissionInfo()
+    }
   }
 
+  async handleMissionInfo() {
+    this.currentUserTaskInfo = await getMissionInfo(this.currentUserTaskInfoParam)
+  }
 
   async handleUserInfo() {
     this.currentUserInfo = await getUserInfo()
@@ -73,14 +103,18 @@ export default struct My_index {
         Text("- 本月任务 -").fontSize(14).fontColor($r('app.color.text_secondary')).lineHeight(20)
         Row() {
           Column() {
-            Text("1000").fontSize(18).fontColor($r('app.color.text_primary')).lineHeight(25).margin({
-              bottom: 17
-            })
+            Text(this.currentUserTaskInfo.taskAmounts?.toString() || "")
+              .fontSize(18)
+              .fontColor($r('app.color.text_primary'))
+              .lineHeight(25)
+              .margin({
+                bottom: 17
+              })
             Text("任务总量").fontSize(12).fontColor($r('app.color.text_primary')).lineHeight(17)
           }.justifyContent(FlexAlign.SpaceAround).layoutWeight(1)
 
           Column() {
-            Text("1000")
+            Text(this.currentUserTaskInfo.completedAmounts?.toString() || "")
               .fontSize(18)
               .fontColor($r('app.color.text_primary'))
               .lineHeight(25)
@@ -89,7 +123,7 @@ export default struct My_index {
           }.justifyContent(FlexAlign.SpaceAround).layoutWeight(1)
 
           Column() {
-            Text("1000")
+            Text(this.currentUserTaskInfo.transportMileage?.toString() || "")
               .fontSize(18)
               .fontColor($r('app.color.text_primary'))
               .lineHeight(25)
@@ -130,6 +164,7 @@ export default struct My_index {
             showRightIcon: true,
             showBottomBorder: false,
             handleRightClick: () => {
+              router.pushUrl({ url: 'pages/setting/Setting' })
             }
           })
 

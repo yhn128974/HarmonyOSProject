@@ -1,1 +1,1 @@
-export  {handleLogin,getUserInfo} from './user'
+export  {handleLogin,getUserInfo,getMissionInfo} from './user'

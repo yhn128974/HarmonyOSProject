@@ -24,6 +24,9 @@ export struct HMCard_item {
         }
       }
     }
+    .onClick(()=>{
+      this.handleRightClick()
+    })
     .justifyContent(FlexAlign.SpaceBetween)
     .alignItems(VerticalAlign.Center)
     .border({

@@ -24,9 +24,9 @@ struct Login {
   async login() {
     this.loading = true
     const result = await handleLogin(this.thisUserCount)
-    promptAction.showToast({
-      message: result
-    })
+    // promptAction.showToast({
+    //   message: result
+    // })
     await TokenStore.setToken(result)
     await AppStorage.setOrCreate(TOKEN_KEY, result)
     this.loading = false
