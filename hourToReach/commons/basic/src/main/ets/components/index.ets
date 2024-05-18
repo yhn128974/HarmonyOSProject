@@ -13,3 +13,5 @@ export { HMList } from './HMList'
 export {HmToggleCard} from './HMToggleCard'
 
 export {HmUpload} from './HMUpLoad'
+
+export {HmPreview } from './HMPreview'

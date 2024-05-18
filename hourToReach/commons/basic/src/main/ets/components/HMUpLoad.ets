@@ -1,5 +1,6 @@
 import { picker } from '@kit.CoreFileKit'
 import { ImageUrl } from '../models'
+import { HmPreview } from './HMPreview'
 
 @Component
 struct HmUpload {
@@ -7,6 +8,14 @@ struct HmUpload {
   title: string = "请拍照上传回单凭证"
   @Prop maxNumber: number = 3
   @State currentImageList: ImageUrl[] = []
+  @State clickedImageIndex: number = -1
+  preview: CustomDialogController = new CustomDialogController({
+    builder: HmPreview({
+      urls: this.currentImageList.map(item => item.url),
+      selectIndex: this.clickedImageIndex
+    }),
+    customStyle: true
+  })
 
   async selectImg() {
     const photo = new picker.PhotoViewPicker() //图片选择对象
@@ -31,9 +40,13 @@ struct HmUpload {
       })
       //图片展示
       Grid() {
-        ForEach(this.currentImageList, (item: ImageUrl) => {
+        ForEach(this.currentImageList, (item: ImageUrl, index: number) => {
           GridItem() {
-            Image(item.url).width(100).aspectRatio(1).borderRadius(4)
+            Image(item.url).width(100).aspectRatio(1).borderRadius(4).onClick(() => {
+              this.clickedImageIndex = index;
+              this.preview.open()
+
+            })
           }
         })
       }
