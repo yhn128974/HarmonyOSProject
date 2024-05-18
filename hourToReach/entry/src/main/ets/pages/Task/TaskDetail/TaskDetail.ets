@@ -1,4 +1,4 @@
-import { HmNavBar, HmToggleCard } from 'basic'
+import { HmNavBar, HmSkeleton, HmToggleCard, HmUpload } from 'basic'
 import { promptAction, router } from '@kit.ArkUI'
 import {
   CommonRouterParams,
@@ -22,7 +22,6 @@ struct TaskDetail {
   @State currentTaskDetailInfo: TaskDetailInfoModel = new TaskDetailInfoModel({} as TaskDetailInfo)
   @State currentExceptionList: ExceptionListModel = new ExceptionListModel({} as ExceptionList)
 
-
   aboutToAppear(): void {
     let currentTaskParams: CommonRouterParams = router.getParams() as object as CommonRouterParams
 
@@ -32,7 +31,7 @@ struct TaskDetail {
   }
 
   async handleTaskDetailInfo(id: string) {
-    this.currentTaskDetailInfo= await getTaskDetail(id)
+    this.currentTaskDetailInfo = await getTaskDetail(id)
   }
 
   @Builder
@@ -50,6 +49,7 @@ struct TaskDetail {
       top: 14
     })
   }
+
   // 获取基础信息
   @Builder
   getBaseContent() {
@@ -59,6 +59,7 @@ struct TaskDetail {
           Text("起").baseTextOneStyle()
           Text(this.currentTaskDetailInfo.startAddress).baseTextTwoStyle()
         }.margin({ top: 21 })
+
         Row() {
           Text("止").baseTextOneStyle().backgroundColor($r('app.color.primary'))
           Text(this.currentTaskDetailInfo.endAddress).baseTextTwoStyle()
@@ -91,12 +92,12 @@ struct TaskDetail {
     })
     this.getBaseContentItem({
       title: '联系电话',
-      value:  this.currentTaskDetailInfo.startHandoverPhone,
-      icon:  $r('app.media.ic_phone')
+      value: this.currentTaskDetailInfo.startHandoverPhone,
+      icon: $r('app.media.ic_phone')
     })
     this.getBaseContentItem({
       title: '提货时间',
-      value:  this.currentTaskDetailInfo.planDepartureTime
+      value: this.currentTaskDetailInfo.planDepartureTime
     })
     this.getBaseContentItem({
       title: '预计送达时间',
@@ -124,18 +125,27 @@ struct TaskDetail {
       top: 14
     })
   }
+
   // 运输路线
   @Builder
   getTransLineContent() {
     Row() {
       Column() {
-        Text(this.currentTaskDetailInfo.startProvince).fontSize(16).fontColor($r('app.color.text_primary')).lineHeight(22).fontWeight(600)
+        Text(this.currentTaskDetailInfo.startProvince)
+          .fontSize(16)
+          .fontColor($r('app.color.text_primary'))
+          .lineHeight(22)
+          .fontWeight(600)
         Text(this.currentTaskDetailInfo.startCity).fontSize(14).lineHeight(22)
       }.width(50)
 
       Image($r("app.media.ic_right_arrow")).width(36).height(16)
       Column() {
-        Text(this.currentTaskDetailInfo.endProvince).fontSize(16).fontColor($r('app.color.text_primary')).lineHeight(22).fontWeight(600)
+        Text(this.currentTaskDetailInfo.endProvince)
+          .fontSize(16)
+          .fontColor($r('app.color.text_primary'))
+          .lineHeight(22)
+          .fontWeight(600)
         Text(this.currentTaskDetailInfo.endCity).fontSize(14).lineHeight(22)
       }.width(50)
     }.justifyContent(FlexAlign.SpaceBetween).alignItems(VerticalAlign.Center).width('100%').padding({
@@ -144,35 +154,92 @@ struct TaskDetail {
     })
   }
 
+  // 提货信息内容
+  @Builder
+  getPickUpContent() {
+    HmUpload({ title: '请拍照上传回单凭证' })
+    HmUpload({ title: '请拍照上传货品照片' })
+  }
+
+  // 底部按钮结构
+  @Builder
+  getBottomBtn() {
+    //已完成不显示任何按钮
+    Row() {
+      Button("延迟收货", { type: ButtonType.Capsule })
+        .backgroundColor($r('app.color.btn_gray'))
+        .fontColor($r('app.color.text_primary'))
+        .fontSize(16)
+        .height(50)
+        .width(125)
+      Button("提货", { type: ButtonType.Capsule })
+        .backgroundColor($r('app.color.primary_disabled'))
+        .fontColor($r('app.color.white'))
+        .height(50)
+        .flexGrow(1)
+        .margin({ left: 13 })
+    }
+    .width('100%')
+    .padding({ left: 15, right: 15 })
+    .height(70)
+    .justifyContent(FlexAlign.SpaceBetween)
+    .alignItems(VerticalAlign.Center)
+    .backgroundColor($r('app.color.white'))
+  }
+
   build() {
     Column() {
-      HmNavBar({ title: '任务详情' })
+      if (this.currentTaskDetailInfo.id) {
+        //
+        HmNavBar({ title: '任务详情' })
+        //
+        Column() {
+          Scroll() {
+            Column() {
+              HmToggleCard({
+                title: '基本信息'
+              }) {
+                this.getBaseContent()
+              }
 
-      Scroll(){
-        Column(){
-          HmToggleCard({
-            title:'基本信息'
-          }){
-            this.getBaseContent()
-          }
-          HmToggleCard({
-            title:'车辆司机信息'
-          }){
-            this.getDriverContent()
-          }
-          HmToggleCard({
-            title:'运输路线'
-          }){
-            this.getTransLineContent()
+              HmToggleCard({
+                title: '车辆司机信息'
+              }) {
+                this.getDriverContent()
+              }
+
+              HmToggleCard({
+                title: '运输路线'
+              }) {
+                this.getTransLineContent()
+              }
+
+              HmToggleCard({
+                title: '提货信息'
+              }) {
+                this.getPickUpContent()
+              }
+
+            }
           }
         }
+        .layoutWeight(1)
+
+        // 底部按钮
+        this.getBottomBtn()
+
+      } else {
+        HmSkeleton()
       }
+
     }.backgroundColor($r('app.color.background_page')).height('100%')
+
   }
 }
 
 
-@Extend(Text) function baseTextOneStyle() {
+@Extend(Text)
+function baseTextOneStyle() {
   .fontSize(12)
   .fontColor($r('app.color.white'))
   .backgroundColor($r('app.color.text_primary'))
@@ -182,6 +249,7 @@ struct TaskDetail {
   .textAlign(TextAlign.Center)
 }
 
-@Extend(Text) function baseTextTwoStyle() {
+@Extend(Text)
+function baseTextTwoStyle() {
   .margin({ left: 11.5 }).fontColor($r('app.color.text_secondary')).fontSize(14).lineHeight(20)
 }

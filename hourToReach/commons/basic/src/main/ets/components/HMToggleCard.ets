@@ -39,7 +39,8 @@ export struct HmToggleCard {
       .borderRadius(10)
       .padding({
         left: 18,
-        right: 18
+        right: 18,
+        bottom:18
       })
 
     }

@@ -11,3 +11,5 @@ export { HmSkeleton } from './HmSkeleton'
 export { HMList } from './HMList'
 
 export {HmToggleCard} from './HMToggleCard'
+
+export {HmUpload} from './HMUpLoad'
