@@ -19,4 +19,10 @@ export {
   TaskListDataModel,
   TaskInfoItemModel,
   TaskTypeEnum,
+  TaskDetailInfo,
+  ExceptionList,
+  TaskDetailInfoModel,
+  ExceptionListModel,
 } from './task'
+
+export {CommonRouterParams} from './router'

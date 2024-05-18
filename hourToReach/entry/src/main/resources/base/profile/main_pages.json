@@ -5,6 +5,7 @@
     "pages/Login/Login",
     "pages/my/My_Index",
     "pages/setting/Setting",
-    "pages/Task/Task_index"
+    "pages/Task/Task_index",
+    "pages/Task/TaskDetail/TaskDetail"
   ]
 }

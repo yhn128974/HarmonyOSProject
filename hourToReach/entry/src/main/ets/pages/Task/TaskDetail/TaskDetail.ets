@@ -1,0 +1,187 @@
+import { HmNavBar, HmToggleCard } from 'basic'
+import { promptAction, router } from '@kit.ArkUI'
+import {
+  CommonRouterParams,
+  TaskDetailInfo,
+  ExceptionList,
+  TaskDetailInfoModel,
+  ExceptionListModel
+} from '../../../common/models'
+import { getTaskDetail } from '../../../common/api'
+import { JSON } from '@kit.ArkTS'
+
+class BaseBuilderClass {
+  title: string = ""
+  value: string = ""
+  icon?: ResourceStr = ""
+}
+
+@Entry
+@Component
+struct TaskDetail {
+  @State currentTaskDetailInfo: TaskDetailInfoModel = new TaskDetailInfoModel({} as TaskDetailInfo)
+  @State currentExceptionList: ExceptionListModel = new ExceptionListModel({} as ExceptionList)
+
+
+  aboutToAppear(): void {
+    let currentTaskParams: CommonRouterParams = router.getParams() as object as CommonRouterParams
+
+    if (currentTaskParams && currentTaskParams.id) {
+      this.handleTaskDetailInfo(currentTaskParams.id)
+    }
+  }
+
+  async handleTaskDetailInfo(id: string) {
+    this.currentTaskDetailInfo= await getTaskDetail(id)
+  }
+
+  @Builder
+  getBaseContentItem(item: BaseBuilderClass) {
+    Row() {
+      Text(item.title).fontSize(14).fontColor($r('app.color.text_secondary'))
+        .lineHeight(20)
+      Row() {
+        Text(item.value).fontSize(14).fontColor($r('app.color.text_secondary'))
+        if (item.icon) {
+          Image(item.icon).width(24).height(24)
+        }
+      }
+    }.justifyContent(FlexAlign.SpaceBetween).width('100%').margin({
+      top: 14
+    })
+  }
+  // 获取基础信息
+  @Builder
+  getBaseContent() {
+    Row() {
+      Column() {
+        Row() {
+          Text("起").baseTextOneStyle()
+          Text(this.currentTaskDetailInfo.startAddress).baseTextTwoStyle()
+        }.margin({ top: 21 })
+        Row() {
+          Text("止").baseTextOneStyle().backgroundColor($r('app.color.primary'))
+          Text(this.currentTaskDetailInfo.endAddress).baseTextTwoStyle()
+        }.margin({ top: 14.5 })
+      }.alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
+      .margin({
+        right: 20
+      })
+
+      Column() {
+        Image($r("app.media.ic_navigation")).width(22).height(22)
+        Text("开始导航").fontSize(14).margin({ top: 10, bottom: 10 })
+      }.justifyContent(FlexAlign.SpaceBetween)
+      .margin({
+        top: 20
+      })
+
+    }.justifyContent(FlexAlign.SpaceBetween).alignItems(VerticalAlign.Center).width('100%')
+
+    Divider().vertical(false).height(2).color($r('app.color.background_divider')).margin({ left: 8, right: 8, top: 21 })
+
+    this.getBaseContentItem({
+      title: '任务编号',
+      value: this.currentTaskDetailInfo.transportTaskId
+    })
+    this.getBaseContentItem({
+      title: '联系人',
+      value: this.currentTaskDetailInfo.startHandoverName
+    })
+    this.getBaseContentItem({
+      title: '联系电话',
+      value:  this.currentTaskDetailInfo.startHandoverPhone,
+      icon:  $r('app.media.ic_phone')
+    })
+    this.getBaseContentItem({
+      title: '提货时间',
+      value:  this.currentTaskDetailInfo.planDepartureTime
+    })
+    this.getBaseContentItem({
+      title: '预计送达时间',
+      value: this.currentTaskDetailInfo.planArrivalTime
+    })
+
+  }
+
+  // 司机信息
+  @Builder
+  getDriverContent() {
+    Row() {
+      Text(`车牌号`).fontSize(14).fontColor($r('app.color.text_secondary'))
+        .lineHeight(20)
+      Text(this.currentTaskDetailInfo.licensePlate).fontSize(14).fontColor($r('app.color.text_secondary'))
+    }.justifyContent(FlexAlign.SpaceBetween).width('100%').margin({
+      top: 14
+    })
+
+    Row() {
+      Text(`司机姓名`).fontSize(14).fontColor($r('app.color.text_secondary'))
+        .lineHeight(20)
+      Text(this.currentTaskDetailInfo.driverName).fontSize(14).fontColor($r('app.color.text_secondary'))
+    }.justifyContent(FlexAlign.SpaceBetween).width('100%').margin({
+      top: 14
+    })
+  }
+  // 运输路线
+  @Builder
+  getTransLineContent() {
+    Row() {
+      Column() {
+        Text(this.currentTaskDetailInfo.startProvince).fontSize(16).fontColor($r('app.color.text_primary')).lineHeight(22).fontWeight(600)
+        Text(this.currentTaskDetailInfo.startCity).fontSize(14).lineHeight(22)
+      }.width(50)
+
+      Image($r("app.media.ic_right_arrow")).width(36).height(16)
+      Column() {
+        Text(this.currentTaskDetailInfo.endProvince).fontSize(16).fontColor($r('app.color.text_primary')).lineHeight(22).fontWeight(600)
+        Text(this.currentTaskDetailInfo.endCity).fontSize(14).lineHeight(22)
+      }.width(50)
+    }.justifyContent(FlexAlign.SpaceBetween).alignItems(VerticalAlign.Center).width('100%').padding({
+      left: 60,
+      right: 60
+    })
+  }
+
+  build() {
+    Column() {
+      HmNavBar({ title: '任务详情' })
+
+      Scroll(){
+        Column(){
+          HmToggleCard({
+            title:'基本信息'
+          }){
+            this.getBaseContent()
+          }
+          HmToggleCard({
+            title:'车辆司机信息'
+          }){
+            this.getDriverContent()
+          }
+          HmToggleCard({
+            title:'运输路线'
+          }){
+            this.getTransLineContent()
+          }
+        }
+      }
+    }.backgroundColor($r('app.color.background_page')).height('100%')
+  }
+}
+
+
+@Extend(Text) function baseTextOneStyle() {
+  .fontSize(12)
+  .fontColor($r('app.color.white'))
+  .backgroundColor($r('app.color.text_primary'))
+  .width(22)
+  .height(22)
+  .borderRadius(11)
+  .textAlign(TextAlign.Center)
+}
+
+@Extend(Text) function baseTextTwoStyle() {
+  .margin({ left: 11.5 }).fontColor($r('app.color.text_secondary')).fontSize(14).lineHeight(20)
+}

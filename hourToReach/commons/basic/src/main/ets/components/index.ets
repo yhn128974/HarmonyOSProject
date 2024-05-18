@@ -9,3 +9,5 @@ export { HmConfirmModel, HMConfirm } from './HMConfirm'
 export { HmSkeleton } from './HmSkeleton'
 
 export { HMList } from './HMList'
+
+export {HmToggleCard} from './HMToggleCard'

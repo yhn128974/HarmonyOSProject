@@ -8,7 +8,6 @@ export struct HMList {
   }
   @BuilderParam ListBuilder: (item: object) => void
   @Prop finished: boolean = false
-
   @State loading: boolean = false //显示加载中的文本,并且用来做阀门
   @Prop
   loadingText: string
@@ -17,13 +16,13 @@ export struct HMList {
 
   @Builder
   onReachEndBuilder() {
-    Row(){
-      if (this.finished ) {
+    Row() {
+      if (this.finished) {
 
-         Text(this.loadingFinishedText).fontSize(14).fontColor($r('app.color.text_secondary'))
+        Text(this.loadingFinishedText).fontSize(14).fontColor($r('app.color.text_secondary'))
 
       }
-      else{
+      else {
 
         Text(this.loadingText).fontSize(14).fontColor($r('app.color.text_secondary'))
         LoadingProgress().width(20).aspectRatio(1).color($r('app.color.text_secondary'))
@@ -32,8 +31,39 @@ export struct HMList {
     }.width('100%').height(50).justifyContent(FlexAlign.Center)
   }
 
+  @State currentRefreshStatus: RefreshStatus = RefreshStatus.Inactive
+
+  handleRefreshText(): string {
+    if (this.currentRefreshStatus === RefreshStatus.Inactive) {
+      return ''
+    }
+    else if (this.currentRefreshStatus === RefreshStatus.Drag) {
+      return '继续下拉'
+    }
+    else if (this.currentRefreshStatus === RefreshStatus.OverDrag) {
+      return '松手加载'
+    }
+    else if (this.currentRefreshStatus === RefreshStatus.Refresh) {
+      return '加载中'
+    }
+    else {
+      return ''
+    }
+  }
+
+  @Builder
+  RefreshDisplayBuilder() {
+
+    Row({
+      space: 10
+    }) {
+      LoadingProgress().width(40).aspectRatio(1).color($r('app.color.primary'))
+      Text(this.handleRefreshText()).fontSize(14).fontColor($r('app.color.text_secondary'))
+    }
+  }
+
   build() {
-    Refresh({ refreshing: $$this.refreshing }) {
+    Refresh({ refreshing: $$this.refreshing, builder: this.RefreshDisplayBuilder() }) {
       List() {
         ForEach(this.objectList, (item: object) => {
           if (this.ListBuilder) {
@@ -51,9 +81,13 @@ export struct HMList {
           this.loading = false
         }
       })
-    }.onStateChange(() => {
+    }.onStateChange((state: RefreshStatus) => {
+
+      this.currentRefreshStatus = state
       //上拉刷新
-      this.upDate()
+      if (state === RefreshStatus.Refresh) {
+        this.upDate()
+      }
     })
 
   }

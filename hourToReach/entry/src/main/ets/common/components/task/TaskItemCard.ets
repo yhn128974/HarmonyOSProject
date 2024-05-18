@@ -1,9 +1,23 @@
 import { TaskInfoItemModel } from '../../models'
+import { router } from '@kit.ArkUI'
 
 @Preview
 @Component
 export struct TaskItemCard {
   @Prop item: TaskInfoItemModel
+
+  // 去提货
+  toPickUp() {
+    if (this.item.enablePickUp) {
+      router.pushUrl({
+        url: 'pages/Task/TaskDetail/TaskDetail',
+        params: {
+          id: this.item.id
+        }
+      })
+    }
+  }
+
   build() {
     Column() {
       Row() {
@@ -62,6 +76,9 @@ export struct TaskItemCard {
           .fontSize(14)
           .height(32)
           .enabled(this.item.enablePickUp)
+          .onClick(() => {
+            this.toPickUp()
+          })
 
       }.justifyContent(FlexAlign.SpaceBetween).width('100%')
     }
