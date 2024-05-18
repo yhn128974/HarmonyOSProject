@@ -14,7 +14,7 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
   if (method === http.RequestMethod.GET) {
     // data参数都拼接到地址上  ?a=1&b=2&c=3
     if (data && Object.keys(data).length) {
-      urlStr += "?" + Object.keys(data).map(key => {
+      urlStr += "?" + Object.keys(data).filter(key=>!!data[key]).map(key => {
         return `${key}=${data[key]}`
       }).join("&")
     }

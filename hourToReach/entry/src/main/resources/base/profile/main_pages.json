@@ -4,6 +4,7 @@
     "pages/Advert/start",
     "pages/Login/Login",
     "pages/my/My_Index",
-    "pages/setting/Setting"
+    "pages/setting/Setting",
+    "pages/Task/Task_index"
   ]
 }

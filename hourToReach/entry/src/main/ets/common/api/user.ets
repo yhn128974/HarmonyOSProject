@@ -2,11 +2,7 @@ import { Request } from 'basic'
 import {
   UserModel,
   UserInfoModel,
-  UserTaskInfo,
-  DailyMileage,
-  UserTaskInfoParams,
   UserTaskInfoModel,
-  DailyMileageModel,
   UserTaskInfoParamsModel
 } from '../models'
 

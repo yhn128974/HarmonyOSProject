@@ -1,6 +1,6 @@
 import { TabClass } from 'basic'
 import My_index from './my/My_index'
-
+import {Task_index} from './Task/Task_index'
 @Entry
 @Component
 struct Index {
@@ -48,7 +48,7 @@ struct Index {
         // TabContent在被选中后才会被创建渲染
         TabContent() {
           if (item.name === 'task') {
-            Text("任务组件")
+            Task_index()
           }
           else if (item.name === 'message') {
             Text("消息组件")
@@ -61,4 +61,5 @@ struct Index {
     }
   }
 }
+
 
