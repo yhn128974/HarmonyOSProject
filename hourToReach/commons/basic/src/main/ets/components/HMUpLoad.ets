@@ -1,14 +1,20 @@
-import { picker } from '@kit.CoreFileKit'
+import { fileIo, picker } from '@kit.CoreFileKit'
 import { ImageUrl } from '../models'
 import { HmPreview } from './HMPreview'
+import { JSON, util } from '@kit.ArkTS'
+import { Request } from '../api'
+import { request } from '@kit.BasicServicesKit'
+import { promptAction } from '@kit.ArkUI'
 
 @Component
-struct HmUpload {
+export struct HmUpload {
   @Prop
   title: string = "请拍照上传回单凭证"
   @Prop maxNumber: number = 3
-  @State currentImageList: ImageUrl[] = []
+  @Prop currentImageList: ImageUrl[] = []
   @State clickedImageIndex: number = -1
+  handleCurrentImageListChange: (list: ImageUrl[]) => void = () => {
+  }
   preview: CustomDialogController = new CustomDialogController({
     builder: HmPreview({
       urls: this.currentImageList.map(item => item.url),
@@ -28,7 +34,9 @@ struct HmUpload {
 
       let newImageList = result.photoUris.map(item => ({ url: item }) as ImageUrl)
       this.currentImageList.push(...newImageList)
+      this.handleCurrentImageListChange(this.currentImageList)
     }
+
   }
 
   build() {
@@ -76,4 +84,28 @@ struct HmUpload {
   }
 }
 
-export { HmUpload }
+export function UploadFile(list: ImageUrl[]) {
+
+  let saveDir = getContext().cacheDir //存储的目录
+  const fileParams: request.File[] = [] //要提交的参数
+  // 因为上传文件需要从沙箱选择文件,所以需要先把相册的文件拷贝到沙箱
+  list.forEach(item => {
+    const file = fileIo.openSync(item.url, fileIo.OpenMode.READ_ONLY) //读取相册的文件
+    //   相册地址
+    const uniqueName = util.generateRandomUUID() + '.jpg'
+    fileIo.copyFileSync(file.fd, saveDir + "/" + uniqueName)
+    fileParams.push({
+      filename: uniqueName,
+      name: 'file', //接口参数名称
+      type: 'jpg', //文件类型后缀
+      uri: `internal://cache/${uniqueName}` //应该是文件放在cache目录下,如果是cache协议 它会自动找到这个文件
+    })
+    fileIo.closeSync(file.fd)
+  })
+  promptAction.showToast({
+    message: JSON.stringify(fileParams)
+  })
+
+}
+
+

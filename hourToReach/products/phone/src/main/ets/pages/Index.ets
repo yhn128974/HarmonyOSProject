@@ -1,5 +1,5 @@
 import { TabClass } from 'basic'
-import My_index from './my/My_index'
+import My_index from './my/My_Index'
 import {Task_index} from './Task/Task_index'
 @Entry
 @Component

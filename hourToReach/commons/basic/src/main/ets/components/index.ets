@@ -12,6 +12,6 @@ export { HMList } from './HMList'
 
 export {HmToggleCard} from './HMToggleCard'
 
-export {HmUpload} from './HMUpLoad'
+export {HmUpload,UploadFile} from './HMUpLoad'
 
 export {HmPreview } from './HMPreview'

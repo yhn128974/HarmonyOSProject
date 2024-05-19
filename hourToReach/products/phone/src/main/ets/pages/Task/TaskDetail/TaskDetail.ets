@@ -1,4 +1,4 @@
-import { HmNavBar, HmSkeleton, HmToggleCard, HmUpload } from 'basic'
+import { HmNavBar, HmSkeleton, HmToggleCard, HmUpload, ImageUrl, UploadFile } from 'basic'
 import { promptAction, router } from '@kit.ArkUI'
 import {
   CommonRouterParams,
@@ -157,8 +157,32 @@ struct TaskDetail {
   // 提货信息内容
   @Builder
   getPickUpContent() {
-    HmUpload({ title: '请拍照上传回单凭证' })
-    HmUpload({ title: '请拍照上传货品照片' })
+    HmUpload({
+      title: '请拍照上传回单凭证',
+      currentImageList: this.currentTaskDetailInfo.cargoPickUpPictureList || [],
+      handleCurrentImageListChange: (list: ImageUrl[]) => {
+        this.currentTaskDetailInfo.cargoPickUpPictureList = list
+      }
+    })
+    HmUpload({
+      title: '请拍照上传货品照片',
+      currentImageList: this.currentTaskDetailInfo.cargoPictureList || [],
+      handleCurrentImageListChange: (list: ImageUrl[]) => {
+        this.currentTaskDetailInfo.cargoPictureList = list
+      }
+    })
+  }
+
+  // 获取提货的状态
+  getPickUpState() {
+    return this.currentTaskDetailInfo.cargoPickUpPictureList?.length > 0 &&
+      this.currentTaskDetailInfo.cargoPictureList?.length > 0 &&
+    this.currentTaskDetailInfo.cargoPickUpPictureList.every(item =>!!item.url) &&
+    this.currentTaskDetailInfo.cargoPictureList.every(item =>!!item.url)
+  }
+
+  btnPick() {
+    UploadFile(this.currentTaskDetailInfo.cargoPickUpPictureList) //传入提供凭证
   }
 
   // 底部按钮结构
@@ -178,6 +202,10 @@ struct TaskDetail {
         .height(50)
         .flexGrow(1)
         .margin({ left: 13 })
+        .enabled(this.getPickUpState())
+        .onClick(() => {
+          this.btnPick()
+        })
     }
     .width('100%')
     .padding({ left: 15, right: 15 })

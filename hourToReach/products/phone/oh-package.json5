@@ -1,12 +1,13 @@
 {
-  "name": "entry",
+  "name": "phone",
   "version": "1.0.0",
   "description": "Please describe the basic information.",
   "main": "",
   "author": "",
   "license": "",
   "dependencies": {
-    "basic":"file:../commons/basic"
+    "basic": "file:../../commons/basic",
+
   },
   "devDependencies": {},
   "dynamicDependencies": {}

@@ -21,8 +21,24 @@
   },
   "modules": [
     {
-      "name": "entry",
-      "srcPath": "./entry",
+      "name": "phone",
+      "srcPath": "./products/phone",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "basic",
+      "srcPath": "./commons/basic",
+    },
+    {
+      "name": "Exception",
+      "srcPath": "./features/Exception",
       "targets": [
         {
           "name": "default",
@@ -32,8 +48,5 @@
         }
       ]
     }
-  ,{
-      "name": "basic",
-      "srcPath": "./commons/basic",
-    }]
+  ]
 }
