@@ -1,14 +1,15 @@
 import { TabClass } from 'basic/Index'
-import { Task_list } from './Task_list'
-
+import { Task_list } from './Task_list/Task_list'
+import {Task_tabs} from './Task_tabs'
 @Entry
 @Component
 export struct Task_index {
   @State
-  tabsData: TabClass[] = [{
-    name: 'waiting',
-    title: '待提货'
-  }, {
+  tabsData: TabClass[] = [
+    {
+      name: 'waiting',
+      title: '待提货'
+    }, {
     name: 'line',
     title: '在途'
   }, {
@@ -48,7 +49,7 @@ export struct Task_index {
             if (item.name == 'waiting') {
               Task_list()
             } else if (item.name == 'line') {
-              Text(item.title)
+              Task_tabs()
             } else {
               Text(item.title)
             }
@@ -62,3 +63,5 @@ export struct Task_index {
     }
   }
 }
+
+

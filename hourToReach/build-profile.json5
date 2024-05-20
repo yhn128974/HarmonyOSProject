@@ -35,18 +35,6 @@
     {
       "name": "basic",
       "srcPath": "./commons/basic",
-    },
-    {
-      "name": "Exception",
-      "srcPath": "./features/Exception",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
     }
   ]
 }

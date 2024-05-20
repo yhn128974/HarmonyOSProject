@@ -25,4 +25,8 @@ export {
   ExceptionListModel,
 } from './task'
 
-export {CommonRouterParams} from './router'
+export { CommonRouterParams } from './router'
+
+export {
+  PickUpParams, PickUpParamsModel
+} from './pickup'

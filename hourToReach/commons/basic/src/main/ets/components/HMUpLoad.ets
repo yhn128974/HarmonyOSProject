@@ -2,17 +2,19 @@ import { fileIo, picker } from '@kit.CoreFileKit'
 import { ImageUrl } from '../models'
 import { HmPreview } from './HMPreview'
 import { JSON, util } from '@kit.ArkTS'
-import { Request } from '../api'
 import { request } from '@kit.BasicServicesKit'
-import { promptAction } from '@kit.ArkUI'
+
+import { uploadImageUrl } from '../api'
 
 @Component
 export struct HmUpload {
   @Prop
   title: string = "请拍照上传回单凭证"
   @Prop maxNumber: number = 3
+  // 当前的图片列表
   @Prop currentImageList: ImageUrl[] = []
   @State clickedImageIndex: number = -1
+  // 给父组件同步数据
   handleCurrentImageListChange: (list: ImageUrl[]) => void = () => {
   }
   preview: CustomDialogController = new CustomDialogController({
@@ -31,7 +33,6 @@ export struct HmUpload {
       maxSelectNumber: this.maxNumber - this.currentImageList.length
     })
     if (result.photoUris.length > 0) {
-
       let newImageList = result.photoUris.map(item => ({ url: item }) as ImageUrl)
       this.currentImageList.push(...newImageList)
       this.handleCurrentImageListChange(this.currentImageList)
@@ -49,12 +50,19 @@ export struct HmUpload {
       //图片展示
       Grid() {
         ForEach(this.currentImageList, (item: ImageUrl, index: number) => {
-          GridItem() {
-            Image(item.url).width(100).aspectRatio(1).borderRadius(4).onClick(() => {
-              this.clickedImageIndex = index;
-              this.preview.open()
 
-            })
+          GridItem() {
+            Stack({ alignContent: Alignment.TopEnd }) {
+              Image(item.url).width(100).aspectRatio(1).borderRadius(4).onClick(() => {
+                this.clickedImageIndex = index;
+                this.preview.open()
+              })
+              Image($r('app.media.ic_btn_delete')).width(30).height(30).onClick(() => {
+                this.currentImageList.splice(index, 1) //移除索引
+                this.handleCurrentImageListChange(this.currentImageList)
+              }
+              )
+            }.margin({ right: 15, bottom: 10 })
           }
         })
       }
@@ -78,16 +86,16 @@ export struct HmUpload {
           this.selectImg()
         })
       }
-
-
     }.alignItems(HorizontalAlign.Start).width('100%')
   }
 }
 
-export function UploadFile(list: ImageUrl[]) {
+
+export async function UploadFile(list: ImageUrl[]) {
 
   let saveDir = getContext().cacheDir //存储的目录
-  const fileParams: request.File[] = [] //要提交的参数
+  //要提交的参数
+  const fileParams: request.File[] = []
   // 因为上传文件需要从沙箱选择文件,所以需要先把相册的文件拷贝到沙箱
   list.forEach(item => {
     const file = fileIo.openSync(item.url, fileIo.OpenMode.READ_ONLY) //读取相册的文件
@@ -102,10 +110,6 @@ export function UploadFile(list: ImageUrl[]) {
     })
     fileIo.closeSync(file.fd)
   })
-  promptAction.showToast({
-    message: JSON.stringify(fileParams)
-  })
-
+  // 返回本地文件
+  return await uploadImageUrl(getContext(), fileParams) // 调用上传接口 // 将上传的结果再返回上一层
 }
-
-

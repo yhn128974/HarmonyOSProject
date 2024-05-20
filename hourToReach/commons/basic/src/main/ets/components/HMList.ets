@@ -53,7 +53,6 @@ export struct HMList {
 
   @Builder
   RefreshDisplayBuilder() {
-
     Row({
       space: 10
     }) {

@@ -1,7 +1,7 @@
-@Entry
+@Preview
 @Component
-struct Index {
-  @State message: string = 'Hello World';
+export struct Task_tabs {
+  @State message: string = '提货页面';
 
   build() {
     Row() {
@@ -15,3 +15,4 @@ struct Index {
     .height('100%')
   }
 }
+

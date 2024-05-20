@@ -1,6 +1,6 @@
 import { HMList } from 'basic'
-import { getTaskList } from '../../common/api'
-import { TaskItemCard } from '../../common/components'
+import { getTaskList } from '../../../common/api'
+import { TaskItemCard } from '../../../common/components'
 import {
   TaskListParams,
   TaskListData,
@@ -9,7 +9,7 @@ import {
   TaskListDataModel,
   TaskInfoItemModel,
   TaskTypeEnum,
-} from '../../common/models'
+} from '../../../common/models'
 import { promptAction } from '@kit.ArkUI'
 
 @Preview
@@ -45,13 +45,10 @@ export struct Task_list {
     this.currentTaskListData = res
     let newCurrentTaskInfoItems: TaskInfoItemModel[] = res.items as TaskInfoItemModel[]
     this.currentTaskInfoItems.push(...newCurrentTaskInfoItems)
-
-
   }
 
   @Builder
   TaskItemCardBuilder(item: TaskInfoItemModel) {
-
     TaskItemCard({ item })
   }
 
@@ -60,13 +57,13 @@ export struct Task_list {
 
       HMList({
         objectList: this.currentTaskInfoItems,
-        upDate:async () => {
+        upDate: async () => {
           await this.handleTaskListData()
           promptAction.showToast({
-            message:'数据更新完毕'
+            message: '数据更新完毕'
           })
         },
-        getMoreDate:async () => {
+        getMoreDate: async () => {
           this.getMoreListDate()
         },
         ListBuilder: (item) => {
@@ -75,7 +72,6 @@ export struct Task_list {
         loadingText: "数据加载中",
         loadingFinishedText: "数据全部加载完毕",
         finished: !!(this.currentTaskListData.page == this.currentTaskListData.pages)
-
       })
 
 

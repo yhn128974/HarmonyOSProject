@@ -2,7 +2,8 @@ import request from '@ohos.request'
 import { BASE_URL, TOKEN_KEY } from '../constants'
 import { ImageUrl, ResponseData } from '../models'
 
-// 返回一个列表 ImageUrl[]
+
+// 获取本地文件
 export const uploadImageUrl = async (context: Context, files: request.File[]) => {
   let config: request.UploadConfig = {
     url: BASE_URL + '/files/imageUpload', // 拼接上传完整地址
@@ -47,7 +48,7 @@ export const uploadImageUrl = async (context: Context, files: request.File[]) =>
         resolve(arr)
       })
       // 4.0 上传完成之后 用文件的一个标识 又去后台查了一下  当时是最优方案
-    }catch(error) {
+    } catch (error) {
       AlertDialog.show({
         message: error.message // 提示错误消息
       })
@@ -56,3 +57,4 @@ export const uploadImageUrl = async (context: Context, files: request.File[]) =>
   })
 
 }
+

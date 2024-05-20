@@ -1,14 +1,15 @@
-import { HmNavBar, HmSkeleton, HmToggleCard, HmUpload, ImageUrl, UploadFile } from 'basic'
+import { HmLoading, HmNavBar, HmSkeleton, HmToggleCard, HmUpload, ImageUrl, UploadFile } from 'basic'
 import { promptAction, router } from '@kit.ArkUI'
 import {
   CommonRouterParams,
   TaskDetailInfo,
-  ExceptionList,
   TaskDetailInfoModel,
-  ExceptionListModel
+  PickUpParamsModel
 } from '../../../common/models'
+
 import { getTaskDetail } from '../../../common/api'
 import { JSON } from '@kit.ArkTS'
+import { pickUp } from '../../../common/api/task'
 
 class BaseBuilderClass {
   title: string = ""
@@ -19,19 +20,63 @@ class BaseBuilderClass {
 @Entry
 @Component
 struct TaskDetail {
+  scroller: Scroller = new Scroller()
+
   @State currentTaskDetailInfo: TaskDetailInfoModel = new TaskDetailInfoModel({} as TaskDetailInfo)
-  @State currentExceptionList: ExceptionListModel = new ExceptionListModel({} as ExceptionList)
+  // 定义一个弹出层控制器
+  loadingDialog: CustomDialogController = new CustomDialogController({
+    builder: HmLoading(),
+    customStyle: true
+  })
+
+  // @State currentExceptionList: ExceptionListModel = new ExceptionListModel({} as ExceptionList)
 
   aboutToAppear(): void {
     let currentTaskParams: CommonRouterParams = router.getParams() as object as CommonRouterParams
-
     if (currentTaskParams && currentTaskParams.id) {
       this.handleTaskDetailInfo(currentTaskParams.id)
     }
   }
 
+  // 获取当前任务信息
   async handleTaskDetailInfo(id: string) {
+
     this.currentTaskDetailInfo = await getTaskDetail(id)
+
+  }
+
+  // 获取提货的状态
+  getPickUpState() {
+    if (
+      this.currentTaskDetailInfo.cargoPickUpPictureList?.length > 0
+        && this.currentTaskDetailInfo.cargoPictureList?.length > 0
+        && this.currentTaskDetailInfo.cargoPickUpPictureList.every(item =>!!item.url)
+        && this.currentTaskDetailInfo.cargoPictureList.every(item =>!!item.url)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  // 提货操作
+  async btnPick() {
+    this.loadingDialog.open()
+    // 相册路径转为本地路径
+    const cargoPickUpPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPickUpPictureList)
+    const cargoPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPictureList)
+
+    // (提货)上传图片
+    await pickUp(new PickUpParamsModel({
+      id: this.currentTaskDetailInfo.id,
+      cargoPickUpPictureList,
+      cargoPictureList
+    }))
+    this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+    // 滚动到顶部
+    this.scroller.scrollEdge(Edge.Top)
+
+    this.loadingDialog.close()
+    promptAction.showToast({ message: '提货成功' })
   }
 
   @Builder
@@ -162,6 +207,9 @@ struct TaskDetail {
       currentImageList: this.currentTaskDetailInfo.cargoPickUpPictureList || [],
       handleCurrentImageListChange: (list: ImageUrl[]) => {
         this.currentTaskDetailInfo.cargoPickUpPictureList = list
+        // promptAction.showToast({
+        //   message: JSON.stringify(list)
+        // })
       }
     })
     HmUpload({
@@ -169,20 +217,12 @@ struct TaskDetail {
       currentImageList: this.currentTaskDetailInfo.cargoPictureList || [],
       handleCurrentImageListChange: (list: ImageUrl[]) => {
         this.currentTaskDetailInfo.cargoPictureList = list
+        // promptAction.showToast({
+        //   message: JSON.stringify(list)
+        // })
       }
+
     })
-  }
-
-  // 获取提货的状态
-  getPickUpState() {
-    return this.currentTaskDetailInfo.cargoPickUpPictureList?.length > 0 &&
-      this.currentTaskDetailInfo.cargoPictureList?.length > 0 &&
-    this.currentTaskDetailInfo.cargoPickUpPictureList.every(item =>!!item.url) &&
-    this.currentTaskDetailInfo.cargoPictureList.every(item =>!!item.url)
-  }
-
-  btnPick() {
-    UploadFile(this.currentTaskDetailInfo.cargoPickUpPictureList) //传入提供凭证
   }
 
   // 底部按钮结构
@@ -197,7 +237,7 @@ struct TaskDetail {
         .height(50)
         .width(125)
       Button("提货", { type: ButtonType.Capsule })
-        .backgroundColor($r('app.color.primary_disabled'))
+        .backgroundColor($r('app.color.primary'))
         .fontColor($r('app.color.white'))
         .height(50)
         .flexGrow(1)
@@ -216,13 +256,14 @@ struct TaskDetail {
   }
 
   build() {
+
     Column() {
       if (this.currentTaskDetailInfo.id) {
         //
         HmNavBar({ title: '任务详情' })
         //
         Column() {
-          Scroll() {
+          Scroll(this.scroller) {
             Column() {
               HmToggleCard({
                 title: '基本信息'

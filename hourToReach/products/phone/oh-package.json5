@@ -6,8 +6,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "basic": "file:../../commons/basic",
 
+    "basic": "file:../../commons/basic",
   },
   "devDependencies": {},
   "dynamicDependencies": {}
