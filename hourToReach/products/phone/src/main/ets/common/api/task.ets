@@ -4,7 +4,8 @@ import {
   TaskListParamsModel,
   PickUpParamsModel,
   DeliverParamsTypeModel,
-  CarRecordTypeModel
+  CarRecordTypeModel,
+  DelayParamsTypeModel
 } from '../models'
 import { Request } from 'basic'
 
@@ -31,5 +32,9 @@ export const carRecord = (data: CarRecordTypeModel) => {
   return Request.post<null>("/tasks/truckRegistration", data)
 }
 
+// 延迟收货
+export const delay = (data: DelayParamsTypeModel) => {
+  return Request.put<null>("/tasks/delay", data)
+}
 
 

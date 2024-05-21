@@ -300,6 +300,15 @@ struct TaskDetail {
           .fontSize(16)
           .height(50)
           .width(125)
+          .onClick(() => {
+            router.pushUrl({
+              url: 'pages/Delay/Delay',
+              params: {
+                id: this.currentTaskDetailInfo.id,
+                oldTime: this.currentTaskDetailInfo.planDepartureTime//计划时间
+              }
+            })
+          })
         Button("提货", { type: ButtonType.Capsule })
           .backgroundColor($r('app.color.primary'))
           .fontColor($r('app.color.white'))
@@ -350,11 +359,11 @@ struct TaskDetail {
           .fontColor($r('app.color.white'))
           .height(50)
           .width('80%')
-          .onClick(()=>{
+          .onClick(() => {
             router.pushUrl({
-              url:'pages/CarRecord/CarRecord',
-              params:{
-                id:this.currentTaskDetailInfo.id
+              url: 'pages/CarRecord/CarRecord',
+              params: {
+                id: this.currentTaskDetailInfo.id
               }
             })
           })

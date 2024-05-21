@@ -38,3 +38,6 @@ export {
 export {
   CarRecordType, CarRecordTypeModel
 } from './car_record'
+
+
+export { DelayParamsType, DelayParamsTypeModel } from './delay'

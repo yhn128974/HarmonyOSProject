@@ -8,6 +8,7 @@
     "pages/Task/Task_index",
     "pages/Task/Task_list/TaskDetail",
 
-    "pages/CarRecord/CarRecord"
+    "pages/CarRecord/CarRecord",
+    "pages/Delay/Delay"
   ]
 }
