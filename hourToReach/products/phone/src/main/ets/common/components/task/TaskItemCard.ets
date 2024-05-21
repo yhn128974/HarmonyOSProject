@@ -1,16 +1,18 @@
-import { TaskInfoItemModel } from '../../models'
-import { router } from '@kit.ArkUI'
+import { TaskInfoItemModel, TaskTypeEnum, TaskInfoItem } from '../../models'
+import { promptAction, router } from '@kit.ArkUI'
+import { JSON } from '@kit.ArkTS'
 
 @Preview
 @Component
 export struct TaskItemCard {
-  @Prop item: TaskInfoItemModel
+  @Prop item: TaskInfoItemModel = new TaskInfoItemModel({} as TaskInfoItem)
 
-  // 去提货
+  // 去详细页面提货
   toPickUp() {
-    if (this.item.enablePickUp) {
+
+    if (this.getBtnEnable()) {
       router.pushUrl({
-        url: 'pages/Task/TaskDetail/TaskDetail',
+        url: 'pages/Task/Task_list/TaskDetail',
         params: {
           id: this.item.id
         }
@@ -18,8 +20,45 @@ export struct TaskItemCard {
     }
   }
 
+  getBtnText() {
+    let res: string = Number(this.item.status).toString()
+    switch (res) {
+      case TaskTypeEnum.Waiting.toString(): {
+        return "提货"
+      }
+      case TaskTypeEnum.Line.toString(): {
+        return "交货"
+      }
+      case TaskTypeEnum.Delivered.toString(): {
+        return "回车登记"
+      }
+      default:
+        return res
+    }
+  }
+
+  getBtnEnable() {
+    if (this.item.enablePickUp) {
+      return true
+    }
+    let res: string = Number(this.item.status).toString()
+    switch (res) {
+      case TaskTypeEnum.Line.toString(): {
+        return true
+      }
+      case TaskTypeEnum.Delivered.toString(): {
+        return true
+      }
+      default:
+        return false
+    }
+
+  }
+
   build() {
     Column() {
+
+
       Row() {
         Text(`任务编号：${this.item.id}`)
           .fontSize(16)
@@ -70,12 +109,12 @@ export struct TaskItemCard {
           Text(this.item.planDepartureTime).fontSize(14).fontColor($r('app.color.text_secondary')).margin({ top: 4 })
         }.alignItems(HorizontalAlign.Start)
 
-        Button("提货", { type: ButtonType.Capsule })
+        Button(this.getBtnText(), { type: ButtonType.Capsule })
           .backgroundColor($r('app.color.primary'))
           .fontColor($r("app.color.white"))
           .fontSize(14)
           .height(32)
-          .enabled(this.item.enablePickUp)
+          .enabled(this.getBtnEnable())
           .onClick(() => {
             this.toPickUp()
           })

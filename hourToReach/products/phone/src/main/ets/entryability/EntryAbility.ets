@@ -16,6 +16,11 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+    // 设置全局沉浸式
+    // windowStage.getMainWindowSync().setWindowLayoutFullScreen(true)
+    // AppStorage.setOrCreate("topHeight",px2vp(windowStage.getMainWindowSync().getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height))
+    // AppStorage.setOrCreate("bottomHeight",px2vp(windowStage.getMainWindowSync().getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR).bottomRect.height))
+
     // 将windowStage对象复制到外层
     this.myWindowStage = windowStage
     //
@@ -25,7 +30,6 @@ export default class EntryAbility extends UIAbility {
         resolve(defaultAdvert)
       }, 500)
     })
-
 
     await AdvertStore.setUserAdvert(USER_SETTING_AD, resDefaultAdvert)
     let myAdvert: AdvertClass = await AdvertStore.getUserAdvert(USER_SETTING_AD) as AdvertClass
@@ -38,7 +42,6 @@ export default class EntryAbility extends UIAbility {
     TokenStore.context = this.context
     let token = await TokenStore.getToken()
     await AppStorage.setOrCreate(TOKEN_KEY, token)
-
     if (token) {
       // Main window is created, set main page for this ability
       windowStage.loadContent('pages/Index', (err) => {

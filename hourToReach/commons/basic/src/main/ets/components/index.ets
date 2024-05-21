@@ -16,3 +16,5 @@ export {HmUpload,UploadFile} from './HMUpLoad'
 
 export {HmPreview } from './HMPreview'
 export {HmLoading} from './HmLoading'
+
+export {HmCheckBox} from './HmCheckBox'

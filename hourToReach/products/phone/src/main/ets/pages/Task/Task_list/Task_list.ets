@@ -15,6 +15,7 @@ import { promptAction } from '@kit.ArkUI'
 @Preview
 @Component
 export struct Task_list {
+  @Prop currentTaskType: TaskTypeEnum
   @State currentTaskListData: TaskListDataModel = new TaskListDataModel({} as TaskListData)
   @State currentTaskInfoItems: TaskInfoItemModel[] = [new TaskInfoItemModel({} as TaskInfoItem)]
   @State currentTaskListParams: TaskListParamsModel = new TaskListParamsModel({} as TaskListParams)
@@ -25,7 +26,7 @@ export struct Task_list {
 
   async handleTaskListData() {
     let firstTaskListParams: TaskListParamsModel = new TaskListParamsModel({
-      status: TaskTypeEnum.Waiting,
+      status: this.currentTaskType,
       page: 1,
       pageSize: 5,
     } as TaskListParams)
@@ -37,7 +38,7 @@ export struct Task_list {
 
   async getMoreListDate() {
     this.currentTaskListParams = new TaskListParamsModel({
-      status: TaskTypeEnum.Waiting,
+      status: this.currentTaskType,
       page: this.currentTaskListParams.page + 1,
       pageSize: 5,
     } as TaskListParams)
@@ -46,6 +47,8 @@ export struct Task_list {
     let newCurrentTaskInfoItems: TaskInfoItemModel[] = res.items as TaskInfoItemModel[]
     this.currentTaskInfoItems.push(...newCurrentTaskInfoItems)
   }
+
+
 
   @Builder
   TaskItemCardBuilder(item: TaskInfoItemModel) {
@@ -72,7 +75,7 @@ export struct Task_list {
         loadingText: "数据加载中",
         loadingFinishedText: "数据全部加载完毕",
         finished: !!(this.currentTaskListData.page == this.currentTaskListData.pages)
-      })
+      }).height('100%')
 
 
       // List({

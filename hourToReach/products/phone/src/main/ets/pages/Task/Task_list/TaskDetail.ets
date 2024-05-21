@@ -4,12 +4,12 @@ import {
   CommonRouterParams,
   TaskDetailInfo,
   TaskDetailInfoModel,
-  PickUpParamsModel
+  PickUpParamsModel,
+  TaskTypeEnum,
+  DeliverParamsTypeModel
 } from '../../../common/models'
 
-import { getTaskDetail } from '../../../common/api'
-import { JSON } from '@kit.ArkTS'
-import { pickUp } from '../../../common/api/task'
+import { getTaskDetail, pickUp, deliver } from '../../../common/api'
 
 class BaseBuilderClass {
   title: string = ""
@@ -21,7 +21,6 @@ class BaseBuilderClass {
 @Component
 struct TaskDetail {
   scroller: Scroller = new Scroller()
-
   @State currentTaskDetailInfo: TaskDetailInfoModel = new TaskDetailInfoModel({} as TaskDetailInfo)
   // 定义一个弹出层控制器
   loadingDialog: CustomDialogController = new CustomDialogController({
@@ -59,7 +58,7 @@ struct TaskDetail {
   }
 
   // 提货操作
-  async btnPick() {
+  async handlePickUp() {
     this.loadingDialog.open()
     // 相册路径转为本地路径
     const cargoPickUpPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPickUpPictureList)
@@ -77,6 +76,41 @@ struct TaskDetail {
 
     this.loadingDialog.close()
     promptAction.showToast({ message: '提货成功' })
+  }
+
+  // 获取交货的状态
+  getDeliverState() {
+    if (
+      this.currentTaskDetailInfo.deliverPictureList?.length > 0
+        && this.currentTaskDetailInfo.certificatePictureList?.length > 0
+        && this.currentTaskDetailInfo.deliverPictureList.every(item =>!!item.url)
+        && this.currentTaskDetailInfo.certificatePictureList.every(item =>!!item.url)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  // 交货操作
+  async handleDeliver() {
+    this.loadingDialog.open()
+    // 相册路径转为本地路径
+    const deliverPictureList = await UploadFile(this.currentTaskDetailInfo.deliverPictureList)
+    const certificatePictureList = await UploadFile(this.currentTaskDetailInfo.certificatePictureList)
+    //  提交图片
+    await deliver(new DeliverParamsTypeModel({
+      id: this.currentTaskDetailInfo.id,
+      certificatePictureList,
+      deliverPictureList,
+    }))
+
+    this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+
+    //滚动到顶部
+    this.scroller.scrollEdge(Edge.Top)
+    this.loadingDialog.close()
+    promptAction.showToast({ message: '交货成功' })
+
   }
 
   @Builder
@@ -199,7 +233,7 @@ struct TaskDetail {
     })
   }
 
-  // 提货信息内容
+  // 同步提货信息
   @Builder
   getPickUpContent() {
     HmUpload({
@@ -210,7 +244,8 @@ struct TaskDetail {
         // promptAction.showToast({
         //   message: JSON.stringify(list)
         // })
-      }
+      },
+      canUpload: this.currentTaskDetailInfo.status === TaskTypeEnum.Waiting
     })
     HmUpload({
       title: '请拍照上传货品照片',
@@ -220,43 +255,114 @@ struct TaskDetail {
         // promptAction.showToast({
         //   message: JSON.stringify(list)
         // })
-      }
+      },
+      canUpload: this.currentTaskDetailInfo.status === TaskTypeEnum.Waiting
 
+
+    })
+  }
+
+  //同步交货信息
+  @Builder
+  getDeliverContent() {
+    HmUpload({
+      title: '请拍照上传交货回单凭证',
+      currentImageList: this.currentTaskDetailInfo.certificatePictureList || [],
+      handleCurrentImageListChange: (list: ImageUrl[]) => {
+        this.currentTaskDetailInfo.certificatePictureList = list
+        // promptAction.showToast({
+        //   message: JSON.stringify(list)
+        // })
+      },
+      canUpload: this.currentTaskDetailInfo.status === TaskTypeEnum.Line
+    })
+    HmUpload({
+      title: '请拍照上传交货货品照片',
+      currentImageList: this.currentTaskDetailInfo.deliverPictureList || [],
+      handleCurrentImageListChange: (list: ImageUrl[]) => {
+        this.currentTaskDetailInfo.deliverPictureList = list
+        // promptAction.showToast({
+        //   message: JSON.stringify(list)
+        // })
+      },
+      canUpload: this.currentTaskDetailInfo.status === TaskTypeEnum.Line
     })
   }
 
   // 底部按钮结构
   @Builder
   getBottomBtn() {
-    //已完成不显示任何按钮
-    Row() {
-      Button("延迟收货", { type: ButtonType.Capsule })
-        .backgroundColor($r('app.color.btn_gray'))
-        .fontColor($r('app.color.text_primary'))
-        .fontSize(16)
-        .height(50)
-        .width(125)
-      Button("提货", { type: ButtonType.Capsule })
-        .backgroundColor($r('app.color.primary'))
-        .fontColor($r('app.color.white'))
-        .height(50)
-        .flexGrow(1)
-        .margin({ left: 13 })
-        .enabled(this.getPickUpState())
-        .onClick(() => {
-          this.btnPick()
-        })
+    if (this.currentTaskDetailInfo.status == TaskTypeEnum.Waiting) {
+      Row() {
+        Button("延迟收货", { type: ButtonType.Capsule })
+          .backgroundColor($r('app.color.btn_gray'))
+          .fontColor($r('app.color.text_primary'))
+          .fontSize(16)
+          .height(50)
+          .width(125)
+        Button("提货", { type: ButtonType.Capsule })
+          .backgroundColor($r('app.color.primary'))
+          .fontColor($r('app.color.white'))
+          .height(50)
+          .flexGrow(1)
+          .margin({ left: 13 })
+          .enabled(this.getPickUpState())
+          .onClick(() => {
+            this.handlePickUp()
+          })
+      }
+      .width('100%')
+      .padding({ left: 15, right: 15 })
+      .height(70)
+      .justifyContent(FlexAlign.SpaceBetween)
+      .alignItems(VerticalAlign.Center)
+      .backgroundColor($r('app.color.white'))
+    } else if (this.currentTaskDetailInfo.status == TaskTypeEnum.Line) {
+      Row() {
+        Button("上报异常", { type: ButtonType.Capsule })
+          .backgroundColor($r('app.color.btn_gray'))
+          .fontColor($r('app.color.text_primary'))
+          .fontSize(16)
+          .height(50)
+          .width(125)
+        Button("交货", { type: ButtonType.Capsule })
+          .backgroundColor($r('app.color.primary'))
+          .fontColor($r('app.color.white'))
+          .height(50)
+          .flexGrow(1)
+          .margin({ left: 13 })
+          .enabled(this.getDeliverState())
+          .onClick(() => {
+            this.handleDeliver()
+          })
+      }
+      .width('100%')
+      .padding({ left: 15, right: 15 })
+      .height(70)
+      .justifyContent(FlexAlign.SpaceBetween)
+      .alignItems(VerticalAlign.Center)
+      .backgroundColor($r('app.color.white'))
+    } else if (this.currentTaskDetailInfo.status == TaskTypeEnum.Delivered) {
+      Row() {
+        // 已交付显示回车登记
+        Button("回车登记", { type: ButtonType.Capsule })
+          .backgroundColor($r('app.color.primary'))
+          .fontColor($r('app.color.white'))
+          .height(50)
+          .width('80%')
+          .onClick(()=>{
+            router.pushUrl({
+              url:'pages/CarRecord/CarRecord',
+              params:{
+                id:this.currentTaskDetailInfo.id
+              }
+            })
+          })
+      }.width('100%').justifyContent(FlexAlign.Center)
     }
-    .width('100%')
-    .padding({ left: 15, right: 15 })
-    .height(70)
-    .justifyContent(FlexAlign.SpaceBetween)
-    .alignItems(VerticalAlign.Center)
-    .backgroundColor($r('app.color.white'))
   }
 
   build() {
-
     Column() {
       if (this.currentTaskDetailInfo.id) {
         //
@@ -283,10 +389,20 @@ struct TaskDetail {
                 this.getTransLineContent()
               }
 
-              HmToggleCard({
-                title: '提货信息'
-              }) {
-                this.getPickUpContent()
+              if (this.currentTaskDetailInfo.status === TaskTypeEnum.Waiting || this.currentTaskDetailInfo.status === TaskTypeEnum.Delivered) {
+                HmToggleCard({
+                  title: '提货信息'
+                }) {
+                  this.getPickUpContent()
+                }
+              }
+
+              if (this.currentTaskDetailInfo.status === TaskTypeEnum.Line || this.currentTaskDetailInfo.status === TaskTypeEnum.Delivered) {
+                HmToggleCard({
+                  title: '交货信息'
+                }) {
+                  this.getDeliverContent()
+                }
               }
 
             }
@@ -296,7 +412,6 @@ struct TaskDetail {
 
         // 底部按钮
         this.getBottomBtn()
-
       } else {
         HmSkeleton()
       }

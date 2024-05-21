@@ -58,7 +58,9 @@ struct Index {
           }
         }.tabBar(this.getTabBar(item))
       })
-    }
+    }.padding({
+      top:AppStorage.get("topHeight")
+    })
   }
 }
 

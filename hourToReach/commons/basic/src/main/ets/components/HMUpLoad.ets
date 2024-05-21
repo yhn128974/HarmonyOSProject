@@ -14,6 +14,7 @@ export struct HmUpload {
   // 当前的图片列表
   @Prop currentImageList: ImageUrl[] = []
   @State clickedImageIndex: number = -1
+  @Prop canUpload: boolean = true
   // 给父组件同步数据
   handleCurrentImageListChange: (list: ImageUrl[]) => void = () => {
   }
@@ -42,7 +43,7 @@ export struct HmUpload {
 
   build() {
     Column() {
-      //
+      //标题
       Text(this.title).fontSize(14).fontColor($r("app.color.text_secondary")).margin({
         top: 16,
         bottom: 16
@@ -57,14 +58,35 @@ export struct HmUpload {
                 this.clickedImageIndex = index;
                 this.preview.open()
               })
-              Image($r('app.media.ic_btn_delete')).width(30).height(30).onClick(() => {
-                this.currentImageList.splice(index, 1) //移除索引
-                this.handleCurrentImageListChange(this.currentImageList)
+              if (this.canUpload) {
+                Image($r('app.media.ic_btn_delete')).width(30).height(30)
+                  .onClick(() => {
+                    this.currentImageList.splice(index, 1) //移除索引
+                    this.handleCurrentImageListChange(this.currentImageList)
+                  })
               }
-              )
-            }.margin({ right: 15, bottom: 10 })
+
+            }
           }
         })
+
+        GridItem() {
+          //添加图标
+          if (this.currentImageList.length < this.maxNumber && this.canUpload) {
+            Row() {
+              Image($r("app.media.ic_add_img")).width(30).height(30)
+            }
+            .width(100)
+            .height(100)
+            .borderRadius(4)
+            .backgroundColor('#F2F2F2')
+            .alignItems(VerticalAlign.Center)
+            .justifyContent(FlexAlign.Center)
+            .onClick(() => {
+              this.selectImg()
+            })
+          }
+        }
       }
       .columnsTemplate('1fr 1fr 1fr')
       .columnsGap(10)
@@ -72,20 +94,6 @@ export struct HmUpload {
       .width('100%')
       .height(Math.ceil(this.maxNumber / 3) * 110)
 
-      //
-      if (this.currentImageList.length < this.maxNumber) {
-        Row() {
-          Image($r("app.media.ic_add_img")).width(30).height(30)
-        }
-        .width(95)
-        .height(95)
-        .backgroundColor('#F2F2F2')
-        .alignItems(VerticalAlign.Center)
-        .justifyContent(FlexAlign.Center)
-        .onClick(() => {
-          this.selectImg()
-        })
-      }
     }.alignItems(HorizontalAlign.Start).width('100%')
   }
 }

@@ -1,3 +1,3 @@
 export  {handleLogin,getUserInfo,getMissionInfo} from './user'
 
-export {getTaskList,getTaskDetail} from './task'
+export {getTaskList,getTaskDetail,deliver,pickUp,carRecord} from './task'

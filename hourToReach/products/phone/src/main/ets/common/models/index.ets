@@ -30,3 +30,11 @@ export { CommonRouterParams } from './router'
 export {
   PickUpParams, PickUpParamsModel
 } from './pickup'
+
+export {
+  DeliverParamsType, DeliverParamsTypeModel
+} from './deliver'
+
+export {
+  CarRecordType, CarRecordTypeModel
+} from './car_record'

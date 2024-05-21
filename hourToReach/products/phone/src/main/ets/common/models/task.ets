@@ -163,6 +163,7 @@ export class TaskInfoItemModel implements TaskInfoItem {
 export enum TaskTypeEnum {
   Waiting = 1,
   Line = 2,
+  Delivered=4,
   Finish = 6
 }
 

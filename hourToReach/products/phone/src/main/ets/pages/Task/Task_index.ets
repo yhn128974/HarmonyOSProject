@@ -1,6 +1,6 @@
 import { TabClass } from 'basic/Index'
+import { TaskTypeEnum } from '../../common/models'
 import { Task_list } from './Task_list/Task_list'
-import {Task_tabs} from './Task_tabs'
 @Entry
 @Component
 export struct Task_index {
@@ -47,11 +47,17 @@ export struct Task_index {
         ForEach(this.tabsData, (item: TabClass, index: number) => {
           TabContent() {
             if (item.name == 'waiting') {
-              Task_list()
+              Task_list({
+                currentTaskType:TaskTypeEnum.Waiting
+              })
             } else if (item.name == 'line') {
-              Task_tabs()
+              Task_list({
+                currentTaskType:TaskTypeEnum.Line
+              })
             } else {
-              Text(item.title)
+              Task_list({
+                currentTaskType:TaskTypeEnum.Finish
+              })
             }
           }.tabBar(this.BarBuilder(item.title, index))
         })

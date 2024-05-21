@@ -5,6 +5,7 @@ import { ImageUrl, ResponseData } from '../models'
 
 // 获取本地文件
 export const uploadImageUrl = async (context: Context, files: request.File[]) => {
+
   let config: request.UploadConfig = {
     url: BASE_URL + '/files/imageUpload', // 拼接上传完整地址
     method: 'POST',
