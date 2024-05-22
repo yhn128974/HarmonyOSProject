@@ -334,6 +334,14 @@ struct TaskDetail {
           .fontSize(16)
           .height(50)
           .width(125)
+          .onClick(() => {
+            router.pushUrl({
+              url: 'pages/ExceptionReport/ExceptionReport',
+              params:{
+                id:this.currentTaskDetailInfo.id
+              }
+            })
+          })
         Button("交货", { type: ButtonType.Capsule })
           .backgroundColor($r('app.color.primary'))
           .fontColor($r('app.color.white'))

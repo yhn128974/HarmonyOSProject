@@ -45,7 +45,7 @@ export struct Task_list {
     const res = await getTaskList(this.currentTaskListParams)
     this.currentTaskListData = res
     let newCurrentTaskInfoItems: TaskInfoItemModel[] = res.items as TaskInfoItemModel[]
-    this.currentTaskInfoItems.push(...newCurrentTaskInfoItems)
+    this.currentTaskInfoItems.push(...newCurrentTaskInfoItems||[])
   }
 
 

@@ -41,3 +41,5 @@ export {
 
 
 export { DelayParamsType, DelayParamsTypeModel } from './delay'
+
+export { ExceptionParamsType, ExceptionParamsTypeModel } from './exception'

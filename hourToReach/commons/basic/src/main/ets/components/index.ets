@@ -18,3 +18,5 @@ export {HmPreview } from './HMPreview'
 export {HmLoading} from './HmLoading'
 
 export {HmCheckBox} from './HmCheckBox'
+
+export {HmSelectCard} from './HmSelectCard'

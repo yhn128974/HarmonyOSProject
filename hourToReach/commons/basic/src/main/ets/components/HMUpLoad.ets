@@ -33,6 +33,7 @@ export struct HmUpload {
       MIMEType: picker.PhotoViewMIMETypes.IMAGE_TYPE,
       maxSelectNumber: this.maxNumber - this.currentImageList.length
     })
+
     if (result.photoUris.length > 0) {
       let newImageList = result.photoUris.map(item => ({ url: item }) as ImageUrl)
       this.currentImageList.push(...newImageList)
