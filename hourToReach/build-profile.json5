@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "0000001CE5CAAF59EA29EB02AFC4E10594E3E6AABB5A25ED65513FBE95DEDED22F25E02F67A3B0BE4759EF0E",
+          "certpath": "C:/Users/Lenovo/Desktop/HarmonyOS/certificateStore/hourToReach/小时达Bate.cer",
+          "keyAlias": "fast",
+          "keyPassword": "0000001CEAEA018139BB9E9FC8C356344962D010BF511DD293E11A9361C61B97F880D18E1C0C95F397A64D66",
+          "profile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificateStore/hourToReach/小时达BateDebug.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificateStore/hourToReach/fast.p12"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
