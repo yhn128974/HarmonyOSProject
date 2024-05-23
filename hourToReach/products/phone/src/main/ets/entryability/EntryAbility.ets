@@ -3,11 +3,18 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { Advert, USER_SETTING, USER_SETTING_AD, AdvertClass, defaultAdvert, TokenStore, TOKEN_KEY } from 'basic'
 import { JSON } from '@kit.ArkTS';
+import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
 
 export default class EntryAbility extends UIAbility {
   myWindowStage: window.WindowStage | undefined = undefined
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+
+    const manger = abilityAccessCtrl.createAtManager()
+    manger.requestPermissionsFromUser(this.context, [
+      "ohos.permission.LOCATION",
+      "ohos.permission.APPROXIMATELY_LOCATION"
+    ])
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
@@ -16,6 +23,12 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+
+    //
+    // windowStage.getMainWindow().then(window => {
+    //   window.setWindowLayoutFullScreen(true)
+    // })
+
     // 设置全局沉浸式
     // windowStage.getMainWindowSync().setWindowLayoutFullScreen(true)
     // AppStorage.setOrCreate("topHeight",px2vp(windowStage.getMainWindowSync().getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height))

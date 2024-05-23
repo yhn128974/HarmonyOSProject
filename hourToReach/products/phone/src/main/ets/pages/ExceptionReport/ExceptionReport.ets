@@ -1,22 +1,70 @@
-import { HMCard, HMCard_item, HmNavBar, HmUpload, ImageUrl, transTimeFormat, HmSelectCard } from 'basic'
+import {
+  HMCard,
+  HMCard_item,
+  HmNavBar,
+  HmUpload,
+  ImageUrl,
+  transTimeFormat,
+  HmSelectCard,
+  UploadFile,
+  HmLoading
+} from 'basic'
 import { promptAction, router } from '@kit.ArkUI'
 import { CommonRouterParams, ExceptionParamsType, ExceptionParamsTypeModel } from '../../common/models'
 import { exceptionReport } from '../../common/api'
+import { JSON } from '@kit.ArkTS'
 
 @Entry
 @Component
 struct ExceptionReport {
+  loading: CustomDialogController = new CustomDialogController({
+    builder: HmLoading
+  })
   @State currentSingleItemIndex: number = -1
-  exceptionList: string[] = ['发动机困难', '不着车,漏油', '照明失灵', '有异动', '排烟器温度异常', '其他问题']
+  exceptionList: string[] = ['发动机启动困难', '不着车', '漏油', '漏水', '照明失灵', '有异响', '排烟异常', '温度异常', '其他']
   @State currentExceptionParams: ExceptionParamsTypeModel = new ExceptionParamsTypeModel({} as ExceptionParamsType)
 
   aboutToAppear(): void {
     const res = router.getParams() as CommonRouterParams
     this.currentExceptionParams.transportTaskId = res.id || ''
+    promptAction.showToast({
+      message: res.id
+    })
+    this.currentExceptionParams.exceptionPlace = '上海市浦东新区'
+  }
+
+  onBackPress(): boolean | void {
+    const res = router.getParams() as CommonRouterParams
+    promptAction.showToast({
+      message: JSON.stringify(res)
+    })
+    if (res.location) {
+      this.currentExceptionParams.exceptionPlace = res.location || '上海市浦东新区'
+    }
+    if (res.id) {
+      this.currentExceptionParams.transportTaskId = res.id || ''
+    }
   }
 
   async handleCurrentExceptionParams() {
+
+    if (this.currentExceptionParams.exceptionImagesList?.length) {
+      const listImage = await UploadFile(this.currentExceptionParams.exceptionImagesList)
+      this.currentExceptionParams.exceptionImagesList = listImage
+    }
+    // 开始上报异常
     await exceptionReport(this.currentExceptionParams)
+
+    promptAction.showToast({
+      message: '上报成功'
+    })
+
+    router.back({
+      url: "pages/Task/Task_list/TaskDetail",
+      params: {
+        addExcept: true
+      }
+    })
   }
 
   BtnEnable() {
@@ -24,7 +72,7 @@ struct ExceptionReport {
     this.currentExceptionParams.exceptionPlace &&
     this.currentExceptionParams.exceptionTime &&
     this.currentExceptionParams.exceptionType &&
-    this.currentExceptionParams.exceptionDescribe)
+    this.currentExceptionParams.exceptionImagesList)
   }
 
   selectTypeDialog: CustomDialogController = new CustomDialogController({
@@ -117,7 +165,9 @@ struct ExceptionReport {
               .placeholderColor($r('app.color.text_secondary'))
               .fontSize(14)
               .onChange((value) => {
+
                 this.currentExceptionParams.exceptionDescribe = value
+
               })
             Text(`${this.currentExceptionParams.exceptionDescribe?.length || 0}/50`)
               .margin({
@@ -134,10 +184,12 @@ struct ExceptionReport {
           HMCard() {
             HmUpload({
               title: '上传图片(最多6张)',
-              currentImageList: [],
+              currentImageList: this.currentExceptionParams.exceptionImagesList || [],
               canUpload: true,
               handleCurrentImageListChange: (list: ImageUrl[]) => {
-                this.currentExceptionParams.exceptionImagesList = list
+                this.currentExceptionParams.exceptionImagesList = list || []
+
+
               }
             })
             Row().height(20)

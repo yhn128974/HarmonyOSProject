@@ -18,6 +18,11 @@ struct Start {
 
   async aboutToAppear() {
 
+    // 开启沉浸式广告
+    window.getLastWindow(getContext()).then((win) => {
+      win.setWindowLayoutFullScreen(true)
+    })
+
     const AdvertStore: Advert = new Advert(getContext(this), USER_SETTING)
 
     this.myAdvert = await AdvertStore.getUserAdvert(USER_SETTING_AD)

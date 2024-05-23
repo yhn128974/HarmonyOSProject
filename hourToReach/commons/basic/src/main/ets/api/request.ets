@@ -9,12 +9,11 @@ const httpRequest = http.createHttp()
 
 async function requestHttp<T>(url: string = "", method: http.RequestMethod = http.RequestMethod.GET, data?: object): Promise<T> {
   let urlStr = BASE_URL + url;
-
   // 如果是get请求手动拼装请求地址格式
   if (method === http.RequestMethod.GET) {
     // data参数都拼接到地址上  ?a=1&b=2&c=3
     if (data && Object.keys(data).length) {
-      urlStr += "?" + Object.keys(data).filter(key=>!!data[key]).map(key => {
+      urlStr += "?" + Object.keys(data).filter(key =>!!data[key]).map(key => {
         return `${key}=${data[key]}`
       }).join("&")
     }
@@ -24,7 +23,7 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
       extraData: method !== http.RequestMethod.GET ? data : "", // 当请求类型不等于get时 复制
       header: {
         "Content-Type": "application/json",
-        Authorization: AppStorage.get(TOKEN_KEY) as string|| "", // 设置请求头的token 每个接口都有
+        Authorization: AppStorage.get(TOKEN_KEY) as string || "", // 设置请求头的token 每个接口都有
       },
       method,
       readTimeout: 10000 // 如果多少秒没响应就断开
@@ -48,12 +47,16 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
     }
     else {
       const data = JSON.parse((res.result) as string) as ResponseData<T>
-      if (data.code == 200) {
+      if (data.code === 200) {
 
-        return data.data as T
+        if (data.data) {
+          return data.data as T
+        } else {
+          return Promise.resolve(null as T)
+        }
       } else {
         promptAction.showToast({
-          message: "服务器异常"
+          message: data.msg
         })
         return Promise.reject(new Error(data.msg))
       }
@@ -67,12 +70,12 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
 }
 
 export class Request {
-  static get<T>(url: string, data?: object): Promise<T> {
-    return requestHttp<T>(url, http.RequestMethod.GET, data)
-  }
-
   static post<T>(url: string, data?: object): Promise<T> {
     return requestHttp<T>(url, http.RequestMethod.POST, data)
+  }
+
+  static get<T>(url: string, data?: object): Promise<T> {
+    return requestHttp<T>(url, http.RequestMethod.GET, data)
   }
 
   static delete<T>(url: string, data?: object): Promise<T> {

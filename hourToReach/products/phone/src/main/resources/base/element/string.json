@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "Location_Reason",
+      "value": "用于定位"
     }
   ]
 }

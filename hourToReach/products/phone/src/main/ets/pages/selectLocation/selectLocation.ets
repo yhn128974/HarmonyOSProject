@@ -1,9 +1,73 @@
 import { HmNavBar, HMCard, HMCard_item } from 'basic'
 import { MapComponent } from '@hms.core.map.MapComponent'
+import { geoLocationManager } from '@kit.LocationKit'
+import { map, mapCommon, site } from '@kit.MapKit'
+import { router } from '@kit.ArkUI'
+
+class SiteClass {
+  name: string = ''
+  distance: number = 0
+}
 
 @Entry
 @Component
 struct SelectLocation {
+  @State currentList: SiteClass[] = []
+  mapController: map.MapComponentController = new map.MapComponentController()
+
+  aboutToAppear(): void {
+    this.getLocation()
+  }
+
+  async getLocation() {
+    const res = await geoLocationManager.getCurrentLocation()
+
+    // let wgs84Position: mapCommon.LatLng = {
+    //   longitude: res.longitude,
+    //   latitude: res.latitude
+    // }
+    // // 将WGS84转化为GCJ02
+    // const rightResult = await map.convertCoordinate(mapCommon.CoordinateType.WGS84, mapCommon.CoordinateType.GCJ02, wgs84Position)
+
+
+    // 将相机挪动到具体的位置
+    this.mapController.moveCamera(
+      map.newCameraPosition({
+        target: {
+          longitude: res.longitude,
+          latitude: res.latitude
+        },
+        zoom: 16
+      })
+    )
+    //   添加标记
+    this.mapController.addPointAnnotation({
+      position: {
+        longitude: res.longitude,
+        latitude: res.latitude
+      },
+      titles: [
+        {
+          content: '您当前的位置'
+        }
+      ]
+    })
+
+    // site.nearbySearch获取当前位置附近
+    const resNearby = await site.nearbySearch({
+      location: {
+        longitude: res.longitude,
+        latitude: res.latitude
+      },
+      pageSize: 4,
+      pageIndex: 1,
+      radius: 50
+    })
+
+    this.currentList = resNearby.sites?.slice(0, 3) as SiteClass[]
+
+  }
+
   build() {
     Column() {
       HmNavBar({ title: '当前位置' })
@@ -27,10 +91,18 @@ struct SelectLocation {
         // 配置区域
         Column() {
           HMCard() {
-            HMCard_item({ leftTitle: '回龙观街道', rightTitle: '100m以内' })
-            HMCard_item({ leftTitle: '金燕龙科研楼', rightTitle: '100m以内' })
-            HMCard_item({ leftTitle: '春野画室', rightTitle: '100m以内' })
-            HMCard_item({ leftTitle: '光滑时代(金艳龙科研楼店)', rightTitle: '100m以内' })
+            ForEach(this.currentList, (item: SiteClass) => {
+              HMCard_item({ leftTitle: item.name, rightTitle: `${item.distance.toString()}m以内` ,handleRightClick:()=>{
+                router.back({
+                  url:"pages/ExceptionReport/ExceptionReport",
+                  params:{
+                    location:item.name,
+                  }
+                })
+              }})
+            })
+
+
           }
         }
         .padding({

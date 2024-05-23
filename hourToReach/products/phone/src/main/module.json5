@@ -14,7 +14,27 @@
     "pages": "$profile:main_pages",
     "requestPermissions": [
       {
-        "name": "ohos.permission.INTERNET"
+        "name": "ohos.permission.INTERNET",
+      },
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:Location_Reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": 'always'
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:Location_Reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": 'always'
+        }
       }
     ],
     "abilities": [
@@ -39,9 +59,11 @@
         ]
       }
     ],
-    "metadata": [{
-      "name": "client_id",
-      "value": '111068389'
-    }]
+    "metadata": [
+      {
+        "name": "client_id",
+        "value": '111068389'
+      }
+    ]
   }
 }
