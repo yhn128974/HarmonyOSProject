@@ -1,4 +1,5 @@
 import { TabClass } from 'basic'
+import Message from './Message/Message'
 import My_index from './my/My_Index'
 import {Task_index} from './Task/Task_index'
 @Entry
@@ -51,7 +52,7 @@ struct Index {
             Task_index()
           }
           else if (item.name === 'message') {
-            Text("消息组件")
+            Message()
           }
           else {
             My_index()

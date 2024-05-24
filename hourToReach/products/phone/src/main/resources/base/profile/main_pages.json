@@ -11,6 +11,10 @@
     "pages/Delay/Delay",
     "pages/ExceptionReport/ExceptionReport",
     "pages/selectLocation/selectLocation",
-    "pages/ExceptionReport/ExceptionDetail"
+    "pages/ExceptionReport/ExceptionDetail",
+    "pages/Message/Message",
+    "pages/Message/MessageDetail",
+    "pages/Car/Car",
+    "pages/UserTask/UserTask"
   ]
 }

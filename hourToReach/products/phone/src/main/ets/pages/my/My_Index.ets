@@ -1,4 +1,4 @@
-import { HMCard, HMCard_item ,HmSkeleton} from 'basic'
+import { HMCard, HMCard_item, HmSkeleton } from 'basic'
 import { getUserInfo, getMissionInfo } from '../../common/api'
 import {
   UserInfo,
@@ -55,7 +55,7 @@ export default struct My_index {
   }
 
   build() {
-    if (this.currentUserInfo.number){
+    if (this.currentUserInfo.number) {
       Column() {
         // 基本信息
         Column() {
@@ -149,6 +149,9 @@ export default struct My_index {
               showRightIcon: true,
               showBottomBorder: true,
               handleRightClick: () => {
+                router.pushUrl({
+                  url: 'pages/Car/Car'
+                })
               }
             })
             HMCard_item({
@@ -157,6 +160,9 @@ export default struct My_index {
               showRightIcon: true,
               showBottomBorder: true,
               handleRightClick: () => {
+                router.pushUrl({
+                  url: 'pages/UserTask/UserTask'
+                })
               }
             })
             HMCard_item({
@@ -174,7 +180,7 @@ export default struct My_index {
 
       }.width('100%').height('100%').backgroundColor($r('app.color.background_page')).borderRadius(8)
 
-    }else {
+    } else {
       HmSkeleton()
     }
   }

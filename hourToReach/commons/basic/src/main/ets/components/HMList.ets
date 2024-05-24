@@ -2,10 +2,13 @@
 export struct HMList {
   @State refreshing: boolean = false
   @Prop objectList: object[] = []
+
   upDate: () => void = () => {
   }
+
   getMoreDate: () => void = () => {
   }
+
   @BuilderParam ListBuilder: (item: object) => void
   @Prop finished: boolean = false
   @State loading: boolean = false //显示加载中的文本,并且用来做阀门

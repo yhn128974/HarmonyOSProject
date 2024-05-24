@@ -9,7 +9,6 @@ export struct TaskItemCard {
 
   // 去详细页面提货
   toPickUp() {
-
     if (this.getBtnEnable()) {
       router.pushUrl({
         url: 'pages/Task/Task_list/TaskDetail',
@@ -60,7 +59,7 @@ export struct TaskItemCard {
 
 
       Row() {
-        Text(`任务编号：${this.item.id}`)
+        Text(`任务编号：${this.item.transportTaskId}`)
           .fontSize(16)
           .fontColor($r("app.color.text_primary"))
           .fontWeight(500)
@@ -109,23 +108,33 @@ export struct TaskItemCard {
           Text(this.item.planDepartureTime).fontSize(14).fontColor($r('app.color.text_secondary')).margin({ top: 4 })
         }.alignItems(HorizontalAlign.Start)
 
-        Button(this.getBtnText(), { type: ButtonType.Capsule })
-          .backgroundColor($r('app.color.primary'))
-          .fontColor($r("app.color.white"))
-          .fontSize(14)
-          .height(32)
-          .enabled(this.getBtnEnable())
-          .onClick(() => {
-            this.toPickUp()
-          })
-
+        if (parseInt(this.item.status) !== TaskTypeEnum.Finish) {
+          Button(this.getBtnText(), { type: ButtonType.Capsule })
+            .backgroundColor($r('app.color.primary'))
+            .fontColor($r("app.color.white"))
+            .fontSize(14)
+            .height(32)
+            .enabled(this.getBtnEnable())
+            .onClick(() => {
+              this.toPickUp()
+            })
+        }
       }.justifyContent(FlexAlign.SpaceBetween).width('100%')
     }
     .margin({ left: 15, right: 15, top: 15 })
     .padding({ left: 19.5, right: 19.5, bottom: 18.5, top: 18.5 })
     .borderRadius(10)
     .backgroundColor($r('app.color.white'))
+    .onClick(() => {
 
+      if (parseInt(this.item.status) === TaskTypeEnum.Finish) {    router.pushUrl({
+        url: 'pages/Task/Task_list/TaskDetail',
+        params: {
+          id: this.item.id
+        }
+      })
+      }
+    })
   }
 }
 

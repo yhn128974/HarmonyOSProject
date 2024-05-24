@@ -43,3 +43,13 @@ export {
 export { DelayParamsType, DelayParamsTypeModel } from './delay'
 
 export { ExceptionParamsType, ExceptionParamsTypeModel } from './exception'
+
+export { MessageQueryType,
+  MessageData,
+  MessageItem,
+  MessageQueryTypeModel,
+  MessageDataModel,
+  MessageItemModel,
+  DetailTypeModel } from './message'
+
+export { UserCarDataType, UserCarDataTypeModel } from './car'

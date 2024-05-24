@@ -14,12 +14,19 @@ import {
 import { getTaskDetail, pickUp, deliver } from '../../../common/api'
 import { common } from '@kit.AbilityKit'
 import { call } from '@kit.TelephonyKit'
+import { JSON, MessageEvents, worker } from '@kit.ArkTS'
+import { ImageUrlModel } from 'basic/src/main/ets/models/common/ImageUrl'
 
 class BaseBuilderClass {
   title: string = ""
   value: string = ""
   icon?: ResourceStr = ""
   iconClick?: () => void
+}
+
+class PostParams {
+  files?: ImageUrl[] = []
+  filePath?: string = '' //沙箱目录
 }
 
 @Entry
@@ -78,22 +85,72 @@ struct TaskDetail {
   // 提货操作
   async handlePickUp() {
     this.loadingDialog.open()
-    // 相册路径转为本地路径
-    const cargoPickUpPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPickUpPictureList)
-    const cargoPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPictureList)
 
-    // (提货)上传图片
-    await pickUp(new PickUpParamsModel({
-      id: this.currentTaskDetailInfo.id,
-      cargoPickUpPictureList,
-      cargoPictureList
-    }))
-    this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
-    // 滚动到顶部
-    this.scroller.scrollEdge(Edge.Top)
+    const ImageCompressWorker1 = new worker.ThreadWorker("phone/ets/workers/uploadWorker.ets")
+    const ImageCompressWorker2 = new worker.ThreadWorker("phone/ets/workers/uploadWorker.ets")
 
-    this.loadingDialog.close()
-    promptAction.showToast({ message: '提货成功' })
+    let pressedCargoPickUpPictureList: ImageUrl[] = []
+    let pressedCargoPictureList: ImageUrl[] = []
+
+
+    ImageCompressWorker1.postMessage({
+      files: [...this.currentTaskDetailInfo.cargoPickUpPictureList],
+      filePath: getContext().filesDir
+    }) //给子线程发消息
+    ImageCompressWorker2.postMessage({
+      files: [...this.currentTaskDetailInfo.cargoPictureList],
+      filePath: getContext().filesDir
+    }) //给子线程发消息
+
+    // 接收子线程的消息
+    ImageCompressWorker1.onmessage = ((e: MessageEvents) => {
+      let res = e.data as PostParams
+      pressedCargoPickUpPictureList = res.files as ImageUrl[]
+      checkFile()
+    })
+    ImageCompressWorker2.onmessage = ((e: MessageEvents) => {
+      let res = e.data as PostParams
+      pressedCargoPictureList = res.files as ImageUrl[]
+      // 销毁线程
+      // ImageCompressWorker2.terminate()
+      checkFile()
+    })
+
+    const checkFile = async () => {
+      if (!!(pressedCargoPickUpPictureList.length && pressedCargoPictureList.length)) {
+        // 上传并获取本地file中的图片
+        const fileImageUrlList = await Promise.all([UploadFile(pressedCargoPickUpPictureList), UploadFile(pressedCargoPictureList)])
+        // 上传本地图片到服务器
+        await pickUp(new PickUpParamsModel({
+          id: this.currentTaskDetailInfo.id,
+          cargoPickUpPictureList: fileImageUrlList[0],
+          cargoPictureList: fileImageUrlList[1],
+        }))
+        this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+        //滚动到顶部
+        this.scroller.scrollEdge(Edge.Top)
+        this.loadingDialog.close()
+        promptAction.showToast({ message: '提货成功' })
+      }
+    }
+
+
+    // // 相册路径转为本地路径
+    // const cargoPickUpPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPickUpPictureList)
+    // const cargoPictureList = await UploadFile(this.currentTaskDetailInfo.cargoPictureList)
+    //
+    // // (提货)上传图片
+    // await pickUp(new PickUpParamsModel({
+    //   id: this.currentTaskDetailInfo.id,
+    //   cargoPickUpPictureList,
+    //   cargoPictureList
+    // }))
+    // this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+    // // 滚动到顶部
+    // this.scroller.scrollEdge(Edge.Top)
+    //
+    // this.loadingDialog.close()
+    // promptAction.showToast({ message: '提货成功' })
   }
 
   // 获取交货的状态
@@ -112,22 +169,70 @@ struct TaskDetail {
   // 交货操作
   async handleDeliver() {
     this.loadingDialog.open()
-    // 相册路径转为本地路径
-    const deliverPictureList = await UploadFile(this.currentTaskDetailInfo.deliverPictureList)
-    const certificatePictureList = await UploadFile(this.currentTaskDetailInfo.certificatePictureList)
-    //  提交图片
-    await deliver(new DeliverParamsTypeModel({
-      id: this.currentTaskDetailInfo.id,
-      certificatePictureList,
-      deliverPictureList,
-    }))
+    const ImageCompressWorker1 = new worker.ThreadWorker("phone/ets/workers/uploadWorker.ets")
+    const ImageCompressWorker2 = new worker.ThreadWorker("phone/ets/workers/uploadWorker.ets")
+    let pressDeliverPictureList: ImageUrl[] = []
+    let pressCertificatePictureList: ImageUrl[] = []
 
-    this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+    ImageCompressWorker1.postMessage({
+      files: [...this.currentTaskDetailInfo.deliverPictureList],
+      filePath: getContext().filesDir
+    }) //给子线程发消息
+    ImageCompressWorker2.postMessage({
+      files: [...this.currentTaskDetailInfo.certificatePictureList],
+      filePath: getContext().filesDir
+    }) //给子线程发消息
 
-    //滚动到顶部
-    this.scroller.scrollEdge(Edge.Top)
-    this.loadingDialog.close()
-    promptAction.showToast({ message: '交货成功' })
+    // 接收子线程的消息
+    ImageCompressWorker1.onmessage = ((e: MessageEvents) => {
+      let res = e.data as PostParams
+      pressDeliverPictureList = res.files as ImageUrl[]
+      checkFile()
+    })
+    ImageCompressWorker2.onmessage = ((e: MessageEvents) => {
+      let res = e.data as PostParams
+      pressCertificatePictureList = res.files as ImageUrl[]
+      checkFile()
+    })
+
+    const checkFile = async () => {
+      if (!!(pressDeliverPictureList.length && pressCertificatePictureList.length)) {
+        // 上传并获取本地file中的图片
+        const fileImageUrlList = await Promise.all([UploadFile(pressDeliverPictureList), UploadFile(pressCertificatePictureList)])
+        // 上传本地图片
+        await deliver(new DeliverParamsTypeModel({
+          id: this.currentTaskDetailInfo.id,
+          deliverPictureList: fileImageUrlList[0],
+          certificatePictureList: fileImageUrlList[1],
+        }))
+        this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+        //滚动到顶部
+        this.scroller.scrollEdge(Edge.Top)
+
+        promptAction.showToast({ message: '交货成功' })
+        this.loadingDialog.close()
+      }
+    }
+
+    // this.loadingDialog.open()
+
+    // // 相册路径转为本地路径
+    // const deliverPictureList = await UploadFile(this.currentTaskDetailInfo.deliverPictureList)
+    // const certificatePictureList = await UploadFile(this.currentTaskDetailInfo.certificatePictureList)
+
+    // 提交图片
+    // await deliver(new DeliverParamsTypeModel({
+    //   id: this.currentTaskDetailInfo.id,
+    //   certificatePictureList: pressCertificatePictureList,
+    //   deliverPictureList: pressDeliverPictureList,
+    // }))
+    //
+    // this.handleTaskDetailInfo(this.currentTaskDetailInfo.id) // 重新拉取数据
+    //
+    // //滚动到顶部
+    // this.scroller.scrollEdge(Edge.Top)
+    // this.loadingDialog.close()
+    // promptAction.showToast({ message: '交货成功' })
 
   }
 
@@ -504,7 +609,7 @@ struct TaskDetail {
                   this.getPickUpContent()
                 }
               }
-              if (this.currentTaskDetailInfo.status === TaskTypeEnum.Waiting || this.currentTaskDetailInfo.status === TaskTypeEnum.Delivered) {
+              if (this.currentTaskDetailInfo.status === TaskTypeEnum.Waiting || this.currentTaskDetailInfo.status === TaskTypeEnum.Delivered || this.currentTaskDetailInfo.status === TaskTypeEnum.Finish) {
                 HmToggleCard({
                   title: '提货信息'
                 }) {
@@ -512,7 +617,7 @@ struct TaskDetail {
                 }
               }
 
-              if (this.currentTaskDetailInfo.status === TaskTypeEnum.Line || this.currentTaskDetailInfo.status === TaskTypeEnum.Delivered) {
+              if (this.currentTaskDetailInfo.status === TaskTypeEnum.Line || this.currentTaskDetailInfo.status === TaskTypeEnum.Delivered || this.currentTaskDetailInfo.status === TaskTypeEnum.Finish) {
                 HmToggleCard({
                   title: '交货信息'
                 }) {
