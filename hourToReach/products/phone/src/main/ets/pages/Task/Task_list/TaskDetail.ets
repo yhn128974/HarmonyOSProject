@@ -1,5 +1,5 @@
 import { HmLoading, HmNavBar, HmSkeleton, HmToggleCard, HmUpload, ImageUrl, UploadFile } from 'basic'
-import { promptAction, router } from '@kit.ArkUI'
+import { componentSnapshot, promptAction, router } from '@kit.ArkUI'
 import {
   CommonRouterParams,
   TaskDetailInfo,
@@ -16,6 +16,7 @@ import { common } from '@kit.AbilityKit'
 import { call } from '@kit.TelephonyKit'
 import { JSON, MessageEvents, worker } from '@kit.ArkTS'
 import { ImageUrlModel } from 'basic/src/main/ets/models/common/ImageUrl'
+import { image } from '@kit.ImageKit'
 
 class BaseBuilderClass {
   title: string = ""
@@ -39,6 +40,8 @@ struct TaskDetail {
     builder: HmLoading(),
     customStyle: true
   })
+  @State snapImage: image.PixelMap | null = null;
+  @State showSnap: boolean = false
 
   // @State currentExceptionList: ExceptionListModel = new ExceptionListModel({} as ExceptionList)
 
@@ -575,9 +578,50 @@ struct TaskDetail {
     })
   }
 
+  // 弹层
+  @Builder
+  getSnapContent() {
+    Column() {
+      Image(this.snapImage)
+        .width("100%")
+        .height("100%")
+        .objectFit(ImageFit.Auto)
+        .borderRadius(6)
+    }
+    .padding("10%")
+    .width("100%")
+    .height("100%")
+    .backgroundColor("rgba(0,0,0,0.2)")
+    .onClick(() => {
+      this.showSnap = false
+    })
+  }
+
   build() {
     Column() {
       if (this.currentTaskDetailInfo.id) {
+        Row() {
+          Image($r("app.media.share"))
+            .width(20)
+            .height(20)
+            .fillColor($r("app.color.primary"))
+            .onClick(async () => {
+              // 获取截图
+              this.snapImage = await componentSnapshot.get('detailPage')
+              // 显示截图弹窗
+              this.showSnap = true
+
+              // 只能在原生组件上使用
+              const myColumn = getInspectorByKey('detailPage')
+              console.log('myColumn', myColumn)
+
+
+            })
+        }
+        .width("100%")
+        .justifyContent(FlexAlign.End)
+        .padding(10)
+
         //
         HmNavBar({ title: '任务详情' })
         //
@@ -635,9 +679,13 @@ struct TaskDetail {
       } else {
         HmSkeleton()
       }
-
-    }.backgroundColor($r('app.color.background_page')).height('100%')
-
+    }
+    .backgroundColor($r('app.color.background_page'))
+    .height('100%')
+    .id('detailPage')
+    .bindContentCover($$this.showSnap, this.getSnapContent(), {
+      modalTransition: ModalTransition.NONE
+    })
   }
 }
 
