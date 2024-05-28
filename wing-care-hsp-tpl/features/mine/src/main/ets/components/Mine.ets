@@ -1,10 +1,22 @@
 import router from '@ohos.router'
-import { ResManager } from '@hm/basic/Index'
+import { ResManager, UserData } from '@hm/basic/Index'
+import { getUserApi } from '../api'
 
 @Component
 export struct Mine {
   @StorageProp('topHeight')
   topHeight: number = 0
+  @State
+  user: UserData | null = null
+
+  async getUser() {
+    const data = await getUserApi()
+    this.user = data
+  }
+
+  aboutToAppear(): void {
+    this.getUser()
+  }
 
   @Builder
   cellItem(title: string, url: string = '') {
@@ -37,21 +49,21 @@ export struct Mine {
           .margin({ top: 12, left: 24 })
           .padding({ top: this.topHeight })
         // 个人信息
+
         Column({ space: 5 }) {
-          Image('https://img2.baidu.com/it/u=130573784,2479509663&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=534')
+          Image(this.user?.avatar || 'https://img2.baidu.com/it/u=130573784,2479509663&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=534')
             .width(74)
             .aspectRatio(1)
             .borderRadius(37)
             .border({ width: 5, color: '#AEE8E4' })
             .shadow({ offsetX: 0, offsetY: 2, radius: 21, color: '#0aa9941f' })
-          Text('刘大壮')
+          Text(this.user?.nickName)
             .fontSize(ResManager.EC_PAGE_TITLE_FS)
             .fontColor(ResManager.EC_MID_BLACK)
             .fontWeight(500)
-          Text('sijigaowa@163.com')
+          Text(this.user?.username)
             .fontSize(13)
             .fontColor(ResManager.EC_MID_59)
-
         }
         .margin({ top: 64 - this.topHeight })
       }

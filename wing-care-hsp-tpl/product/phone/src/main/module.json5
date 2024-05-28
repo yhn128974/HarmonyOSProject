@@ -9,11 +9,31 @@
       "tablet",
       "2in1"
     ],
+    "metadata": [
+      {
+        "name": "client_id",
+        "value": "111108285"
+      }
+    ],
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET"
       },
-      ],
+      {
+        "name": "ohos.permission.ACCESS_BLUETOOTH",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [ "EntryAbility"],
+          "when":"inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO"
+      },
+      {
+        "name": "ohos.permission.ACCELEROMETER"
+      }
+    ],
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",

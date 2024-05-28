@@ -4,7 +4,7 @@ import { window } from '@kit.ArkUI';
 import { Log } from '@abner/log'
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn'
-import { RouterConfig } from '@hm/basic/Index';
+import { RouterConfig, UserSore } from '@hm/basic/Index';
 
 // 设置语言为中文
 dayjs.locale('zh-cn');
@@ -27,9 +27,20 @@ export default class EntryAbility extends UIAbility {
     Log.info('Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     Log.info('Ability onWindowStageCreate');
+    //
+    // let FirstUrl: string = ''
+    // UserSore.context = this.context
+    // let token = await UserSore.getUserInfo()
+    //
+    // if (token.token) {
+    //   FirstUrl = RouterConfig.SPLASH_URL
+    // } else {
+    //   FirstUrl = RouterConfig.LOGIN_URL
+    // }
+
     windowStage.loadContent(RouterConfig.SPLASH_URL, (err, data) => {
       if (err.code) {
         Log.error('Failed to load the content. Cause: %{public}s' + JSON.stringify(err) ?? '');

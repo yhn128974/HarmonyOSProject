@@ -1,5 +1,6 @@
 import { ResManager } from '@hm/basic/Index'
 import { router } from '@kit.ArkUI'
+import { UserSore, RouterConfig } from '@hm/basic'
 
 @Entry
 @Component
@@ -11,13 +12,40 @@ struct SplashPage {
   timer: number = -1
 
   countdown() {
-    this.timer = setInterval(() => {
+
+    this.timer = setInterval(async () => {
       this.count--
+
+
       if (this.count === 0) {
+
+
         clearInterval(this.timer)
-        router.pushUrl({
-          url: 'pages/Index'
-        })
+
+
+        // 判断用户是否登陆
+
+        // router.replaceUrl({
+        //   url: RouterConfig.LOGIN_URL
+        // })
+
+        /////////////////////////////////////////
+        let context = getContext()
+        UserSore.context = context
+
+        let userToken = await UserSore.getUserInfo()
+
+        if (userToken.token) {
+          router.replaceUrl({
+            url: 'pages/Index'
+          })
+        } else {
+          router.replaceUrl({
+            url: RouterConfig.LOGIN_URL
+          })
+
+        }
+
       }
     }, 1000)
   }

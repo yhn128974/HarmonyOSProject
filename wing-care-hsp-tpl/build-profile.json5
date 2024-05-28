@@ -1,6 +1,19 @@
 {
   "app": {
     "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "0000001CDB0F7ADB426F7BD757631C053DB42183A9C1B8BEFC77D6CCC31988B090E1252A8D6FFC22E6965557",
+          "certpath": "C:/Users/Lenovo/Desktop/HarmonyOS/HarmonyOSProject/wing-care-hsp-tpl/certificateStore/provide.cer",
+          "keyAlias": "1289746201",
+          "keyPassword": "0000001C962C18FC77D8D76CAC41467FE5D14AECBAAD23416EB1F9DFA35B2F8EF79B4B0984DBC0C089BCEE31",
+          "profile": "C:/Users/Lenovo/Desktop/HarmonyOS/HarmonyOSProject/wing-care-hsp-tpl/certificateStore/provideDebug.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:/Users/Lenovo/Desktop/HarmonyOS/HarmonyOSProject/wing-care-hsp-tpl/certificateStore/provide.p12"
+        }
+      }
     ],
     "products": [
       {

@@ -1,5 +1,7 @@
 import { ResManager } from '@hm/basic/Index'
 import router from '@ohos.router'
+import { MessageCountData } from '../models'
+import { getMessageCountApi } from '../api/HomeApi';
 
 // 模块排列位置
 enum Pos {
@@ -9,18 +11,29 @@ enum Pos {
 
 @Component
 export struct Home {
-  // 消息
-  @Builder
+  @State msgCount: MessageCountData | null = null;
+
+  aboutToAppear(): void {
+    this.agetMsgCount()
+  }
+
+  async agetMsgCount() {
+    this.msgCount = await getMessageCountApi()
+  }
+
   /**
    *
    * @param title
    * @param icon
    * @param url
    */
-  msgItem(title: string, icon: Resource | string, count: number, i: number) {
+  // 消息
+  @Builder
+  msgItem(title: string, icon: Resource | string, msgCount: MessageCountData | null, i: number) {
     Column() {
       Badge({
-        count, position: BadgePosition.RightTop, style: {
+        count: i === 0 ? this.msgCount?.elderAlertMsgCount! : this.msgCount?.nursingTaskMsgCount!,
+        position: BadgePosition.RightTop, style: {
           badgeColor: '#FF6363',
           borderColor: '#fff',
           borderWidth: 2,
@@ -52,7 +65,7 @@ export struct Home {
   }
 
   // 模块item
-  @Builder
+
   /**
    *
    * @param title
@@ -60,6 +73,7 @@ export struct Home {
    * @param pos
    * @param url
    */
+  @Builder
   careItem(title: string, icon: ResourceStr, pos: Pos, url: string = '') {
     if (pos === Pos.x) {
       // 护理工作台
@@ -124,8 +138,8 @@ export struct Home {
           //  1.2 消息提醒
           Column() {
             Row({ space: 10 }) {
-              this.msgItem('老人报警消息', $r("app.media.ic_home_jkbj"), 6, 1)
-              this.msgItem('任务提醒消息', $r("app.media.ic_home_rwtx"), 2, 0)
+              this.msgItem('老人报警消息', $r("app.media.ic_home_jkbj"), this.msgCount, 0)
+              this.msgItem('任务提醒消息', $r("app.media.ic_home_rwtx"), this.msgCount, 1)
             }
           }
           .margin({
