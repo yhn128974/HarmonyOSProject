@@ -36,6 +36,7 @@ export struct Connect {
           left: 10,
           right: 10
         }).backgroundColor($r('app.color.white'))
+
       }.width('100%')
 
       List() {

@@ -1,7 +1,7 @@
 // 消息类型
 import { MsgStatusComp } from '../components/MsgStatusComp'
 import router from '@ohos.router'
-import { ResManager } from '@hm/basic/Index'
+import { ResManager, MessageCountData } from '@hm/basic/Index'
 
 class MsgItem {
   type: string = ''
@@ -10,29 +10,45 @@ class MsgItem {
   selectIcon: ResourceStr = ''
 }
 
+interface currentRouterParam {
+  type: number
+}
+
 @Entry
 @Component
 struct MsgPage {
+  @StorageProp('msgCount')
+  msgCount: MessageCountData | null = null
   @StorageProp('topHeight')
   topHeight: number = 0
   @State
   activeType: number = 0
+  @State msgTypes: MsgItem[] = []
   private controller: TabsController = new TabsController()
+
+  aboutToAppear(): void {
+    let res = router.getParams() as currentRouterParam
+    this.activeType = res.type
+    // console.log("res", JSON.stringify(res))
+
+    this.msgTypes = [
+      {
+        type: '老人报警',
+        count: this.msgCount?.elderAlertMsgCount!,
+        defaultIcon: $r("app.media.ic_wode_jkbj"),
+        selectIcon: $r("app.media.ic_wode_jkbj_sel")
+      },
+      {
+        type: '任务提醒',
+        count: this.msgCount?.nursingTaskMsgCount!,
+        defaultIcon: $r("app.media.ic_wode_rwtx"),
+        selectIcon: $r("app.media.ic_wode_rwtx_sel")
+      }
+    ]
+  }
+
   // 消息类型
-  msgTypes: MsgItem[] = [
-    {
-      type: '老人报警',
-      count: 6,
-      defaultIcon: $r("app.media.ic_wode_jkbj"),
-      selectIcon: $r("app.media.ic_wode_jkbj_sel")
-    },
-    {
-      type: '任务提醒',
-      count: 2,
-      defaultIcon: $r("app.media.ic_wode_rwtx"),
-      selectIcon: $r("app.media.ic_wode_rwtx_sel")
-    }
-  ]
+
 
   // 导航右侧内容
   @Builder
@@ -44,7 +60,6 @@ struct MsgPage {
     }
     .margin({ right: ResManager.EC_CONTENT_SPACE })
     .height('100%')
-
   }
 
   build() {
@@ -55,6 +70,7 @@ struct MsgPage {
           ForEach(this.msgTypes, (item: MsgItem, i: number) => {
             TabContent() {
               // 消息类型: 0 老人报警  ｜ 1 任务提醒
+
               MsgStatusComp({ type: i })
             }
           })

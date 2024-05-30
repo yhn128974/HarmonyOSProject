@@ -1,40 +1,100 @@
 import router from '@ohos.router'
-import { EcDialogUpload, ResManager } from '@hm/basic'
+import { EcDialogUpload, ResManager, RouterConfig, UserData, uploadApi } from '@hm/basic'
+import { Log } from '@abner/log'
+import { EcLoading } from '@itheima/wing-care'
+import fs from '@ohos.file.fs'
+import { FormData } from '@ohos/axios'
+import { updateUserPhotoApi } from '../api'
+import { promptAction } from '@kit.ArkUI'
 
+interface cellItemParam {
+  title: string,
+  rightContent?: string
+}
 
 @Entry
 @Component
 struct MinePage {
   @StorageProp('topHeight')
   topHeight: number = 0
+  // 1. 获取用户信息
+  @StorageProp('UserInfo')
+  user: UserData | null = null
+  // 全屏 loading 弹层
+  loading: CustomDialogController = new CustomDialogController({
+    builder: EcLoading({ tip: '上传中...' }),
+    customStyle: true,
+    autoCancel: false,
+    alignment: DialogAlignment.Center
+  })
   // 上传弹层控制
   uploadDialog: CustomDialogController = new CustomDialogController({
     // 使用自定义弹层组件
-    builder: EcDialogUpload({}),
+    builder: EcDialogUpload({
+      getPhotoUrl: async (uri: string) => {
+        Log.info(uri)
+        await this.handleAvatarUpload(uri)
+        this.uploadDialog.close()
+      }
+    }),
     alignment: DialogAlignment.Bottom
   })
 
+  async handleAvatarUpload(uri: string) {
+    try {
+      this.loading.open()
+      // 将文件保存到沙箱
+      let currentContext = getContext()
+      // 1. 读取 uri
+      // 打开文件指定打开模式
+      let file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
+
+      let copyFilePath = currentContext.cacheDir + '/' + file.name
+
+      // fs.copyFileSync (原始路径,新路径)
+      fs.copyFileSync(file.fd, copyFilePath)
+
+      // 生成formData格式
+      let formData = new FormData()
+      formData.append('file', `internal://cache/${file.name}`)
+
+      // 上传文件
+      const newAvatarUrl = await uploadApi(formData, currentContext)
+      // 后台更新用户图片
+      this.user!.avatar = newAvatarUrl
+      await updateUserPhotoApi(newAvatarUrl)
+
+
+      this.loading.close()
+      promptAction.showToast({ message: '修改成功' })
+    } catch (e) {
+      this.loading.close()
+      Log.error(e)
+    }
+
+  }
+
   @Builder
-  cellItem(title: string, rightContent: string = '') {
+  cellItem(currentParam: cellItemParam) {
     Row() {
-      Text(title)
+      Text(currentParam.title)
         .fontColor(ResManager.EC_MID_19)
         .fontSize(ResManager.EC_MODULE_TITLE_FS)
         .fontWeight(500)
       Row({ space: 10 }) {
-        if (rightContent) {
+        if (!!currentParam.rightContent) {
           // 昵称修改
-          Text(rightContent)
+          Text(currentParam.rightContent)
             .fontColor(ResManager.EC_MID_59)
             .fontSize(ResManager.EC_NORMAL_FS)
             .onClick(() => {
               router.pushUrl({
-                url: 'pages/mine/NickNamePage'
+                url: RouterConfig.USER_NAME_URL
               })
             })
         } else {
           // 上传
-          Image('https://img2.baidu.com/it/u=130573784,2479509663&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=534')
+          Image(this.user?.avatar)
             .width(34)
             .aspectRatio(1)
             .borderRadius(17)
@@ -58,11 +118,11 @@ struct MinePage {
         Column() {
           List() {
             ListItem() {
-              this.cellItem('头像')
+              this.cellItem({ title: '头像' })
             }
 
             ListItem() {
-              this.cellItem('昵称', '思密达')
+              this.cellItem({ title: '昵称', rightContent: this.user?.nickName })
             }
           }
           .width('100%')

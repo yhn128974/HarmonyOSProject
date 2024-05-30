@@ -1,6 +1,6 @@
-import { ResManager } from '@hm/basic/Index'
+import { MessageCountData, ResManager, RouterConfig } from '@hm/basic/Index'
 import router from '@ohos.router'
-import { MessageCountData } from '../models'
+
 import { getMessageCountApi } from '../api/HomeApi';
 
 // 模块排列位置
@@ -11,14 +11,16 @@ enum Pos {
 
 @Component
 export struct Home {
-  @State msgCount: MessageCountData | null = null;
+  @StorageLink('msgCount') msgCount: MessageCountData | null = null;
 
   aboutToAppear(): void {
     this.agetMsgCount()
   }
 
   async agetMsgCount() {
-    this.msgCount = await getMessageCountApi()
+    let currentmsgCount: MessageCountData = await getMessageCountApi()
+    this.msgCount = currentmsgCount
+    AppStorage.setOrCreate('msgCount', currentmsgCount)
   }
 
   /**
@@ -27,6 +29,7 @@ export struct Home {
    * @param icon
    * @param url
    */
+
   // 消息
   @Builder
   msgItem(title: string, icon: Resource | string, msgCount: MessageCountData | null, i: number) {
@@ -56,7 +59,7 @@ export struct Home {
     .backgroundColor(ResManager.EC_MID_WHITE)
     .onClick(() => {
       router.pushUrl({
-        url: '@bundle:com.heima.elderly.pro/message/ets/pages/MsgPage',
+        url: RouterConfig.USER_MSG_URL,
         params: {
           type: i
         }
@@ -181,10 +184,10 @@ export struct Home {
               .margin({ bottom: 13 })
             // 内容
             Row({ space: 10 }) {
-              this.careItem('设备安装', $r('app.media.icon_home_sbaz'), Pos.y, 'pages/device/SetupDevicePage')
-              this.careItem('设备绑定', $r('app.media.icon_home_sbkz'), Pos.y, 'pages/device/BindDevicePage')
-              this.careItem('我的设备', $r('app.media.icon_home_wdsb'), Pos.y, 'pages/device/MyDevicePage')
-              this.careItem('报警设备', $r('app.media.icon_home_bjsb'), Pos.y, 'pages/device/AlarmDevicePage')
+              this.careItem('设备安装', $r('app.media.icon_home_sbaz'), Pos.y, RouterConfig.DEVICE_SETUP_URL)
+              this.careItem('设备绑定', $r('app.media.icon_home_sbkz'), Pos.y, RouterConfig.DEVICE_BIND_URL)
+              this.careItem('我的设备', $r('app.media.icon_home_wdsb'), Pos.y, RouterConfig.DEVICE_MY_URL)
+              this.careItem('报警设备', $r('app.media.icon_home_bjsb'), Pos.y, RouterConfig.DEVICE_ALARM_URL)
 
             }
             .width('100%')

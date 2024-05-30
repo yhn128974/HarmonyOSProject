@@ -4,15 +4,20 @@ import { EcDialogTips } from '@itheima/wing-care'
 @Component
 export struct MsgItemComp {
   // 消息类型: 0 老人报警 ｜ 1 任务提醒
+
   @Prop
   type: number = 0
   @Prop
   item: number
   // 3. 查看详情
   @State
-  detailTitle: string = this.type === 0 ? '老人报警' : '任务提醒'
+  detailTitle: string = ''
   @State
   detail: number = 0
+
+  aboutToAppear(): void {
+    this.type === 0 ? '老人报警' : '任务提醒'
+  }
 
   @Builder
   tipsContent() {
@@ -122,20 +127,21 @@ export struct MsgItemComp {
   build() {
     Column() {
       Row() {
+        // 列表展示
         Column({ space: 10 }) {
           Badge({
             value: '',
             style: { badgeSize: 4, badgeColor: '#FF6363' },
             position: BadgePosition.RightTop
           }) {
-            Text('护理任务提醒' + this.item)
+            Text(this.type === 0 ? '[异常数据]老人数据异常,请及时查看' : '护理任务提醒' + this.item)
               .fontSize(16)
               .fontWeight(700)
               .fontColor(ResManager.EC_MID_BLACK)
               .margin({ right: 8 })
           }
 
-          Text('您有一个新的护理任务，请及时处理')
+          Text(this.type === 0 ? '欧浩 HeartRate 益康手表B9-D10 ' : "您有一个新的护理任务，请及时处理")
             .fontSize(13)
             .fontColor(ResManager.EC_MID_59)
 

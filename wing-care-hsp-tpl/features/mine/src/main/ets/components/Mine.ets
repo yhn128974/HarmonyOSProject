@@ -1,21 +1,51 @@
 import router from '@ohos.router'
-import { ResManager, UserData } from '@hm/basic/Index'
+import { ResManager, RouterConfig, UserData, UserSore } from '@hm/basic/Index'
 import { getUserApi } from '../api'
+import { promptAction } from '@kit.ArkUI'
+import { preferences } from '@kit.ArkData'
 
 @Component
 export struct Mine {
   @StorageProp('topHeight')
   topHeight: number = 0
-  @State
+  @StorageLink('UserInfo')
   user: UserData | null = null
 
   async getUser() {
     const data = await getUserApi()
     this.user = data
+    AppStorage.setOrCreate('UserInfo', data)
   }
 
   aboutToAppear(): void {
     this.getUser()
+  }
+
+  async logOut() {
+    const checkedRes = await promptAction.showDialog({
+      title: '提示',
+      message: "确定退出等于吗",
+      buttons: [
+        {
+          text: '取消',
+          color: '#ccc'
+        }, {
+        text: '确定',
+        color: '#000'
+      }
+      ]
+    })
+    if (checkedRes.index === 1) {
+      UserSore.delUser()
+      router.replaceUrl({
+        url: RouterConfig.LOGIN_URL
+      }, () => {
+        // 清除路由历史记录
+        router.clear()
+        
+      })
+    }
+
   }
 
   @Builder
@@ -57,6 +87,11 @@ export struct Mine {
             .borderRadius(37)
             .border({ width: 5, color: '#AEE8E4' })
             .shadow({ offsetX: 0, offsetY: 2, radius: 21, color: '#0aa9941f' })
+            .onClick(() => {
+              router.pushUrl({
+                url: RouterConfig.USER_SET_URL
+              })
+            })
           Text(this.user?.nickName)
             .fontSize(ResManager.EC_PAGE_TITLE_FS)
             .fontColor(ResManager.EC_MID_BLACK)
@@ -82,6 +117,8 @@ export struct Mine {
           // Image($r('app.media.ic_arrow_black'))
           //   .width(7)
           //   .height(16)
+
+
         }
         .width('100%')
 
@@ -124,15 +161,17 @@ export struct Mine {
       .backgroundColor('#fff')
       .borderRadius(ResManager.EC_NORMAL_RD)
 
-      Button(
-        '退出'
-      )
+      Button('退出')
         .fontColor(ResManager.EC_MID_19)
         .width(230)
         .height(40)
         .borderRadius(28)
         .backgroundColor('#fff')
         .margin({ top: 50 })
+        .onClick(() => {
+          this.logOut()
+
+        })
 
 
     }

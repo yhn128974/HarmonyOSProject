@@ -1,1 +1,1 @@
-export  const USER_SRORE='user store'
+export const USER_SRORE = 'user store'

@@ -11,6 +11,7 @@ import { Log } from '@abner/log';
 import { UserSore } from '.';
 import { router } from '@kit.ArkUI';
 import { RouterConfig } from '../constants';
+import { Context } from '@ohos.abilityAccessCtrl';
 
 
 export const currentAxios = axios.create({
@@ -82,7 +83,7 @@ interface RequestParams<R> {
   params?: R;
   data?: R;
   headers?: RawAxiosRequestHeaders | AxiosHeaders;
-  context?: null;
+  context?: Context;
 }
 
 export function request<T = null, R = null>(requestParams: RequestParams<R>): Promise<T> {
