@@ -3,6 +3,10 @@
     "pages/SetupDevicePage",
     "pages/BindDevicePage",
     "pages/MyDevicePage",
-    "pages/AlarmDevicePage"
+    "pages/AlarmDevicePage",
+    "pages/NearDevicePage",
+    "pages/access_control/DoorControlPage",
+    "pages/BindTipPage",
+    "pages/NetDoorPage"
   ]
 }

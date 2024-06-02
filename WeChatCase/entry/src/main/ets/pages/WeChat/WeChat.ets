@@ -1,5 +1,5 @@
 import { MessageInfoModel } from '../../models/message'
-import { WeChatStore } from '../../utils/chat_store'
+
 import { router } from '@kit.ArkUI'
 import { emitter } from '@kit.BasicServicesKit'
 import { Record_Update_EventName } from '../../constant'
@@ -8,7 +8,10 @@ import { scanCore, scanBarcode } from '@kit.ScanKit';
 // 导入默认界面需要的日志模块和错误码模块
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-
+import { WeChatStore } from '../../store/chat_store'
+interface person{
+name:string
+}
 @Component
 export default struct WeChat {
   @State list: MessageInfoModel[] = []
@@ -62,8 +65,10 @@ export default struct WeChat {
 
   async getAllRecord() {
     this.list = await WeChatStore.getAllLastRecord()
-    emitter.on(Record_Update_EventName, async () => {
+    // 订阅线程事件
+    emitter.on(Record_Update_EventName, async (data:emitter.EventData) => {
       this.list = await WeChatStore.getAllLastRecord()
+
     })
   }
 

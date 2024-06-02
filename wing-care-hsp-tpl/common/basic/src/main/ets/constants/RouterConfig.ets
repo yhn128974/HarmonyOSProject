@@ -19,6 +19,7 @@ export class RouterConfig {
   static readonly DEVICE_SETUP_URL: string = `@bundle:${RouterConfig.BDNAME}/device/ets/pages/SetupDevicePage`
   static readonly DEVICE_SETUP_TIP_URL: string = `@bundle:${RouterConfig.BDNAME}/device/ets/pages/SetupTipPage`
   static readonly DEVICE_ELDER_SEL_URL: string = `@bundle:${RouterConfig.BDNAME}/device/ets/pages/ElderSelPage`
+
   static readonly DEVICE_PRODUCT_SEL_URL: string = `@bundle:${RouterConfig.BDNAME}/device/ets/pages/ProductDevicePage`
   // 设备绑定
   static readonly DEVICE_BIND_URL: string = `@bundle:${RouterConfig.BDNAME}/device/ets/pages/BindDevicePage`

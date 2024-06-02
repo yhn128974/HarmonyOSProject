@@ -1,19 +1,17 @@
 import router from '@ohos.router';
-import { WeChat_ConnectKey, WeChat_CurrentUserKey } from '../../constant';
+import { WeChat_CurrentUserKey } from '../../constant';
 import { UserInfo, UserInfoModel } from '../../models/user';
 import BottomInput from './Components/BottomInput'
 import { Message } from './Components/Message'
 
 import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../models/message'
-import { promptAction } from '@kit.ArkUI';
-import { getRequestMessage } from '../../utils/request'
-import { ChatResponse, ChatResponseModel } from '../../models/chat';
-import { WeChatStore } from '../../utils/chat_store';
+
 import { AudioRenderer } from '../../utils/audio_renderer';
 import { AvPlayer } from '../../utils/av_player';
 import PreviewImag from './Components/previewDialog'
-import Location from './Components/Location';
 import { VoiceTransfer } from '../../utils/VoiceTransfer';
+import { WeChatStore } from '../../store/chat_store';
+import { getRequestMessage } from '../../api';
 
 @Entry
 @Component
@@ -184,7 +182,7 @@ struct ChatDetail {
           })
         }.onAppear(() => {
           this.scroller.scrollEdge(Edge.End)
-        }).onAreaChange(()=>{
+        }).onAreaChange(() => {
           this.scroller.scrollEdge(Edge.End)
         })
       }

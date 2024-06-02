@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storePassword": "0000001CC6DE42FAC9BC4ED35DEEAEA1B395B19E96908DA959EB6352439970145AE83E52E2A96ABFF9277751",
-          "certpath": "C:/Users/Lenovo/Desktop/HarmonyOS/certificate/longyouWechat.cer",
+          "storePassword": "0000001CA78C6A000545551743F969D16489189B83CF93A40D2A6C1892C6108F892552C6FEE253C5EBB02EF5",
+          "certpath": "C:/Users/Lenovo/Desktop/HarmonyOS/certificateStore/wechat/longyouWechat.cer",
           "keyAlias": "longyou",
-          "keyPassword": "0000001C554187A64C87A941587AA2D65945C4AB3BF9EBA1EDA0502F887FA8EF8691C5447837B40588B6C1A2",
-          "profile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificate/longyou_wechatDebug.p7b",
+          "keyPassword": "0000001CD591E10661D283A4E7B5D2DFB3EB8C248885A40C4A9D4E7BBAF4E78DA35AB463185F3CA30FC2185F",
+          "profile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificateStore/wechat/longyou_wechatDebug.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificate/.p12"
+          "storeFile": "C:/Users/Lenovo/Desktop/HarmonyOS/certificateStore/wechat/.p12"
         }
       }
     ],

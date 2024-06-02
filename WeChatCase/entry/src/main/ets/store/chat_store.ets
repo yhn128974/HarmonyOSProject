@@ -1,3 +1,8 @@
+import preferences from '@ohos.data.preferences'
+import { emitter } from '@kit.BasicServicesKit'
+
+import { FileCommon } from '../utils'
+import { DefaultUserList, UserInfoModel, CurrentUser, MessageInfoModel } from '../models'
 import {
   weChat_StoreKey,
   WeChat_ConnectKey,
@@ -5,11 +10,7 @@ import {
   WeChat_UserRecordKey,
   Record_Update_EventName,
 } from '../constant'
-import preferences from '@ohos.data.preferences'
-import { DefaultUserList, UserInfoModel, CurrentUser } from '../models/user'
-import { MessageInfoModel } from '../models/message'
-import { emitter } from '@kit.BasicServicesKit'
-import { FileCommon } from './file_operate'
+
 
 export class WeChatStore {
   static context: Context
@@ -69,7 +70,12 @@ export class WeChatStore {
     const store = WeChatStore.getWeChatMessageStore(userId)
     store.putSync(mess.id, JSON.stringify(mess))
     await store.flush()
-    emitter.emit(Record_Update_EventName)
+    // 发布线程事件
+    emitter.emit(Record_Update_EventName, {
+      data: {
+        'name': "longyou"
+      }
+    })
   }
 
   // 删除某个人的一条聊天记录
@@ -77,6 +83,7 @@ export class WeChatStore {
     const store = WeChatStore.getWeChatMessageStore(userId)
     store.deleteSync(messId)
     await store.flush()
+    // 激发线程事件
     emitter.emit(Record_Update_EventName)
   }
 
@@ -86,8 +93,10 @@ export class WeChatStore {
     const users = await WeChatStore.getWeChatConnect()
     let list: MessageInfoModel[] = []
 
+
     users.forEach(user => {
       const messList = WeChatStore.getWeChatMessage(user.user_id)
+
       if (messList && messList.length) {
         list.push(messList[messList.length - 1])
       }

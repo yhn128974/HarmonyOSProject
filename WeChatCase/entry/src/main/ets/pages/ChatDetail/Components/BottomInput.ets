@@ -2,8 +2,7 @@ import { display, promptAction } from '@kit.ArkUI'
 
 import VoiceInput from './VoiceInput'
 import { abilityAccessCtrl, bundleManager, common } from '@kit.AbilityKit'
-import { constant } from '@kit.ConnectivityKit'
-import AudioCapturer from '../../../utils/audio_recorder'
+
 import { FileCommon } from '../../../utils/file_operate'
 import { VoiceRecordEnum } from '../../../models/voice'
 import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../../models/message'
@@ -12,12 +11,13 @@ import { UserInfo, UserInfoModel } from '../../../models/user'
 import { PopupItem } from '../../../models/popup'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { util } from '@kit.ArkTS'
+
 // 导入相机需要依赖
 import cameraPicker from '@ohos.multimedia.cameraPicker';
 import camera from '@ohos.multimedia.camera';
-import { BusinessError } from '@ohos.base';
 import Location from './Location'
 import { VoiceTransfer } from '../../../utils/VoiceTransfer'
+import { AudioCapturer } from '../../../utils'
 
 let mContext = getContext(this) as common.Context;
 

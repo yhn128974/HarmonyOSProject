@@ -1,5 +1,5 @@
 import { EcDeviceTip } from '@itheima/wing-care';
-import { ResManager } from '@hm/basic/Index';
+import { ResManager, RouterConfig } from '@hm/basic/Index';
 import { router } from '@kit.ArkUI';
 
 @Entry
@@ -22,9 +22,9 @@ struct BindTipPage {
         EcDeviceTip({
           type: 'success',
           message: '绑定成功',
-          btnText: '去查看',
+          btnText: this.tips === 1 ? '去查看' : '去配网',
           closeUrl: '',
-          url: 'pages/device/MyDevicePage'
+          url: this.tips === 1 ? RouterConfig.DEVICE_MY_URL : RouterConfig.DEVICE_DOOR_NET_URL
         })
       } else {
         EcDeviceTip({ type: 'fail', message: '绑定失败', btnText: '重新绑定' })

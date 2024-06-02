@@ -1,8 +1,8 @@
-import { BusinessError } from '@ohos.base';
+
 import { speechRecognizer, textToSpeech } from '@kit.CoreSpeechKit';
 import { util } from '@kit.ArkTS';
 import fileIo from '@ohos.file.fs';
-import { promptAction } from '@kit.ArkUI';
+
 
 export class VoiceTransfer {
   // 语音识别成文字

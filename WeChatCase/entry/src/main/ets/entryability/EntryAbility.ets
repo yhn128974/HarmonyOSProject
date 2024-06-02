@@ -1,9 +1,10 @@
 import { abilityAccessCtrl, AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
-import { WeChatStore } from '../utils/chat_store';
+
 import { WeChat_CurrentUserKey } from '../constant';
 import { UserInfo, UserInfoModel } from '../models/user';
+import { WeChatStore } from '../store/chat_store';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {

@@ -1,8 +1,8 @@
 import router from '@ohos.router'
-import { getDeviceMap, ResManager, ecBlue } from '@hm/basic/Index'
+import { getDeviceMap, ResManager, ecBlue, RouterConfig, ProductNameMap } from '@hm/basic/Index'
 import { getUnbindDeviceListApi } from '../api'
 import { DeviceItem, UnBindProductItem } from '../model'
-
+import { deviceParamsStore } from '../utils/DeviceParams'
 
 @Entry
 @Component
@@ -15,6 +15,7 @@ export struct BindDevicePage {
   @State flag: number = 0
   @State
   selectedProd: UnBindProductItem | null = null
+  @State
   selectedDevice: DeviceItem | null = null
   // 加载数据
   load = async () => {
@@ -70,7 +71,6 @@ export struct BindDevicePage {
     this.selectedProd = item
     this.selectedDevice = device
     this.flag = Date.now()
-
   }
 
   @Builder
@@ -195,7 +195,59 @@ export struct BindDevicePage {
   }
 
   checkBlueAccess() {
-    ecBlue.checkBluePermission()
+
+    //win蓝牙验证无法通过
+    // ecBlue.checkBluePermission(() => {
+    //
+    //   deviceParamsStore.setParams(this.selectedDevice?.iotId, this.selectedDevice?.nodeId)
+    //
+    //   //win蓝牙验证无法通过
+    //   if (this.selectedProd?.productName === ProductNameMap.Access_control) {
+    //     router.pushUrl({
+    //       url: RouterConfig.DEVICE_NEAR_URL,
+    //       params: {
+    //         iotId: this.selectedDevice?.iotId
+    //       }
+    //     })
+    //   }
+    //   else if (this.selectedProd?.productName === ProductNameMap.Blood_glucose_meter) {
+    //     router.pushUrl({
+    //       url: RouterConfig.DEVICE_BIND_BLOOD_URL,
+    //       params: {
+    //         iotId: this.selectedDevice?.iotId
+    //       }
+    //     })
+    //   }
+    //   else {
+    //     AlertDialog.show({
+    //       message: '暂不支持的设备类型！'
+    //     })
+    //   }
+    // })
+
+    // 跳过蓝牙验证
+    deviceParamsStore.setParams(this.selectedDevice?.iotId, this.selectedDevice?.nodeId)
+    if (this.selectedProd?.productName === ProductNameMap.Access_control) {
+      router.pushUrl({
+        url: RouterConfig.DEVICE_NEAR_URL,
+        params: {
+          iotId: this.selectedDevice?.iotId
+        }
+      })
+    }
+    else if (this.selectedProd?.productName === ProductNameMap.Blood_glucose_meter) {
+      router.pushUrl({
+        url: RouterConfig.DEVICE_BIND_BLOOD_URL,
+        params: {
+          iotId: this.selectedDevice?.iotId
+        }
+      })
+    }
+    else {
+      AlertDialog.show({
+        message: '暂不支持的设备类型！'
+      })
+    }
   }
 
   build() {
@@ -232,7 +284,6 @@ export struct BindDevicePage {
               //   url: 'pages/device/NearDevicePage'
               // })
             })
-
         }
         .justifyContent(FlexAlign.Center)
         .width('100%')

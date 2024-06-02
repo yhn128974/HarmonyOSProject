@@ -7,32 +7,33 @@ import { access } from '@kit.ConnectivityKit';
 
 class EcBlueAuth {
   // 检测蓝牙授权
-  async checkBluePermission() {
+  async checkBluePermission(callback: () => void) {
     let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION |
     bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_METADATA;
     try {
       // 1. 获取应用信息
       const bundleInfo = await bundleManager.getBundleInfoForSelf(bundleFlags)
-
       // abilityAccessCtrl.createAtManager创建权限管理器
       let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
       // let tokenID: number = 0; // 系统应用可以通过bundleManager.getApplicationInfo获取,普通应用可以通过bundleManager.getBundleInfoForSelf获取
       let permissionName: Permissions = 'ohos.permission.ACCESS_BLUETOOTH';
       // 获取当前蓝牙状态信息
       let data: abilityAccessCtrl.GrantStatus = atManager.checkAccessTokenSync(bundleInfo.appInfo.accessTokenId, permissionName);
+      // 条件一
       if (data === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
-        this.reqUserPermission()
+        this.reqUserPermission(callback)
         return
       }
-
+      // 条件二
       if (!this.isBlueOpen()) {
         AlertDialog.show({
           message: '请打开蓝牙开关'
         })
         return
       }
+      //执行回调函数
+      callback()
 
-      Log.info('蓝牙权限：' + data)
 
     } catch (err) {
       let message = (err as BusinessError).message;
@@ -41,7 +42,7 @@ class EcBlueAuth {
   }
 
   // 向用户申请授权
-  reqUserPermission() {
+  reqUserPermission(callback: () => void) {
     // abilityAccessCtrl.createAtManager创建权限管理器
     let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
     // 使用UIExtensionAbility：将common.UIAbilityContext 替换为common.UIExtensionContext
@@ -57,7 +58,9 @@ class EcBlueAuth {
           if (data.authResults[0] === 0) {
 
             if (this.isBlueOpen()) {
-              Log.info('go')
+              // Log.info('go')
+              // 满足全部条件执行回调函数
+              callback()
             } else {
               AlertDialog.show({ message: '请打开蓝牙开关' })
             }

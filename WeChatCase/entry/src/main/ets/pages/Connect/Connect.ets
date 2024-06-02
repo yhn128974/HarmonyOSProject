@@ -1,6 +1,7 @@
 import { promptAction, router } from '@kit.ArkUI'
 import { UserInfoModel } from '../../models/user'
-import { WeChatStore } from '../../utils/chat_store'
+import { WeChatStore } from '../../store/chat_store'
+
 
 @Component
 export struct Connect {
