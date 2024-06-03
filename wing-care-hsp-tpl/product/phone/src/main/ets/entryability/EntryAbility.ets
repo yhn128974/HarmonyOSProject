@@ -4,7 +4,7 @@ import { window } from '@kit.ArkUI';
 import { Log } from '@abner/log'
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn'
-import { RouterConfig, UserSore } from '@hm/basic/Index';
+import { RouterConfig, UserSore, } from '@hm/basic/Index';
 
 // 设置语言为中文
 dayjs.locale('zh-cn');
@@ -41,7 +41,7 @@ export default class EntryAbility extends UIAbility {
     //   FirstUrl = RouterConfig.LOGIN_URL
     // }
 
-    windowStage.loadContent(RouterConfig.SPLASH_URL, (err, data) => {
+    windowStage.loadContent(RouterConfig.DEVICE_DOOR_BLUE_OPEN_URL, (err, data) => {
       if (err.code) {
         Log.error('Failed to load the content. Cause: %{public}s' + JSON.stringify(err) ?? '');
         return;

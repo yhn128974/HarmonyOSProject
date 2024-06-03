@@ -84,13 +84,15 @@ struct NearDevicePage {
     //   }
     // })
 
-    //   假设成功
+    //   假设未连接
     router.pushUrl({
+
       url: RouterConfig.DEVICE_BIND_TIP_URL,
       params: {
         tips: 1
       }
     })
+
   }
 
   run() {

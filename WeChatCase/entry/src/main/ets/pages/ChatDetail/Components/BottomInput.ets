@@ -1,8 +1,6 @@
 import { display, promptAction } from '@kit.ArkUI'
-
 import VoiceInput from './VoiceInput'
 import { abilityAccessCtrl, bundleManager, common } from '@kit.AbilityKit'
-
 import { FileCommon } from '../../../utils/file_operate'
 import { VoiceRecordEnum } from '../../../models/voice'
 import { MessageInfo, MessageInfoModel, MessageTypeEnum } from '../../../models/message'
@@ -24,7 +22,8 @@ let mContext = getContext(this) as common.Context;
 @Preview
 @Component
 struct BottomInput {
-  @Provide asrResult:string=''
+
+  @Provide asrResult: string = ''
   @StorageProp(WeChat_CurrentUserKey)
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
   @Consume talkUser: UserInfoModel
@@ -40,7 +39,8 @@ struct BottomInput {
   tempAudioPath: string = ""
   duration: number = 0 //音频的秒数
   timer: number = -1 //定时器的标记
-  @State currentAddress: string = ""
+  @State
+  currentAddress: string = ""
   @State
   bottomList: PopupItem[] = [
     {
@@ -97,7 +97,6 @@ struct BottomInput {
   @State
   showBottomCard: boolean = false // 显示底部
 
-
   // 发送文本
   sentTextMessage: (content: string) => void = () => {
   }
@@ -109,6 +108,186 @@ struct BottomInput {
   }
   // 文本控制器
   textController: TextInputController = new TextInputController() //文本控制器
+
+  aboutToAppear(): void {
+    this.getScreenWidth()
+    AudioCapturer.init()
+  }
+
+  aboutToDisappear(): void {
+    AudioCapturer.release()
+  }
+
+  // 打开相机
+  async openCamera() {
+    const result = await cameraPicker.pick(getContext(), [
+      cameraPicker.PickerMediaType.PHOTO,
+      cameraPicker.PickerMediaType.VIDEO
+    ], {
+      cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK//后置摄像头
+    })
+
+    const filePath = getContext().filesDir + '/' + util.generateRandomUUID()
+    const file = fileIo.openSync(result.resultUri, fileIo.OpenMode.READ_ONLY)
+    let extendName = 'jpg'
+    let messTpye = MessageTypeEnum.IMAGE
+    let messContent = '[图片]'
+    // 注意系统GUB,类型判断不上
+    if (result.mediaType === 'video') {
+      extendName = 'mp4'
+      messTpye = MessageTypeEnum.VIDEO
+      messContent = '[视频]'
+    }
+    // 考培文件
+    fileIo.copyFileSync(file.fd, filePath + extendName)
+    fileIo.closeSync(file.fd)
+    this.sendImageMessage([new MessageInfoModel({
+      connectUser: this.talkUser,
+      sendUser: this.currentUser,
+      sourceFilePath: filePath + extendName,
+      messageType: messTpye,
+      messageContent: messContent
+    } as MessageInfo)])
+
+    AlertDialog.show({
+      message: JSON.stringify(result)
+    })
+  }
+
+  // 发送图片
+  async sendPhoto() {
+    //   打开相册
+    const photo = new picker.PhotoViewPicker()
+    let result = await photo.select({
+      MIMEType: picker.PhotoViewMIMETypes.IMAGE_TYPE,
+      maxSelectNumber: 9
+    })
+
+    AlertDialog.show({ message: JSON.stringify(result.photoUris) })
+    let messList: MessageInfoModel[] = []
+
+    result.photoUris.forEach(url => {
+      const file = fileIo.openSync(url, fileIo.OpenMode.READ_ONLY)
+      const newFileName = getContext().filesDir + "/" + util.generateRandomUUID() + '.jpg'
+      fileIo.copyFileSync(file.fd, newFileName)
+      // 发了一张图片，一个消息
+      messList.push(
+        new MessageInfoModel({
+          connectUser: this.talkUser,
+          sendUser: this.currentUser,
+          sourceFilePath: newFileName,
+          messageType: MessageTypeEnum.IMAGE,
+          messageContent: "[图片]"
+        } as MessageInfo)
+      )
+      fileIo.closeSync(file.fd) //关闭相册的读取
+      //   循环结束之后 发送消息 发送一个列表
+      this.sendImageMessage(messList)
+      animateTo({ duration: 150 }, () => {
+        this.showBottomCard = false
+      })
+
+    })
+  }
+
+
+  async getScreenWidth() {
+    const result = await display.getAllDisplays()
+    if (result && result.length) {
+      this.screenWidth = px2vp(result[0].width) //记录宽度
+      this.screenHeight = px2vp(result[0].height) //记录高度
+    }
+  }
+
+  // 检查权限
+  checkPermission() {
+    const result = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
+    const manger = abilityAccessCtrl.createAtManager() //创建一个manger
+    const status = manger.checkAccessTokenSync(result.appInfo.accessTokenId, "ohos.permission.MICROPHONE")
+    if (status === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
+      promptAction.showToast({ message: '状态是拒绝' })
+      //无法再次申请因而无法录音，需要手动打开权限
+      // ability 传参 打开设置页面
+      const context = getContext() as common.UIAbilityContext
+      context.startAbility({
+        bundleName: "com.huawei.hmos.settings",
+        abilityName: "com.huawei.hmos.settings.MainAbility",
+        uri: "application_info_entry",
+        parameters: {
+          pushParams: result.name //打开具体设置
+        }
+      })
+
+    } else {
+      this.isShowVoiceBuilder = true
+      this.beginCollectVoice()
+
+    }
+  }
+
+  // 开始录音
+  beginCollectVoice() {
+    this.tempAudioPath = FileCommon.createAudioFile() //创建音频文件
+    AudioCapturer.start(this.tempAudioPath) //开始录音了
+    this.startTime()
+  }
+
+  // 松手逻辑
+  releaseFinger() {
+    this.isShowVoiceBuilder = false
+    this.endTime()
+
+    AudioCapturer.stop()
+    if (this.voiceState === VoiceRecordEnum.Cancel) {
+      //   取消发生
+      FileCommon.delFilePath(this.tempAudioPath) //删除文件
+      this.duration = 0
+    }
+    if (this.voiceState === VoiceRecordEnum.Recording) {
+      FileCommon.delFilePath(this.tempAudioPath) //删除文件
+      if (this.duration < 1) {
+        promptAction.showToast({
+          message: '音频时长过短'
+        })
+        return
+      }
+      // 发送语音
+      this.sendAudio()
+    }
+    if (this.voiceState === VoiceRecordEnum.Transfer) {
+      // 转化文本
+    }
+    // 无论是什么状态，最终到要回到正常状态
+    this.voiceState = VoiceRecordEnum.Recording
+    promptAction.showToast({ message: '计时' + this.duration })
+    //  该发消息了
+
+  }
+
+  //发送语音
+  sendAudio() {
+    let newMessage = new MessageInfoModel({
+      sourceDuration: this.duration, //时长
+      messageContent: `[语音]${this.duration}'`,
+      messageType: MessageTypeEnum.AUDIO,
+      sendUser: this.currentUser,
+      connectUser: this.talkUser,
+      sourceFilePath: this.tempAudioPath,
+    } as MessageInfo)
+    this.sendAudioMessage(newMessage)
+    this.duration = 0 //重置时长
+    this.tempAudioPath = '' //清除路径
+  }
+
+  startTime() {
+    this.timer = setInterval(() => {
+      this.duration++
+    }, 1000)
+  }
+
+  endTime() {
+    clearInterval(this.timer)
+  }
 
   // 显示语音输入组件
   @Builder
@@ -191,183 +370,6 @@ struct BottomInput {
 
   }
 
-  // 打开相机
-  async openCamera() {
-    const result = await cameraPicker.pick(getContext(), [
-      cameraPicker.PickerMediaType.PHOTO,
-      cameraPicker.PickerMediaType.VIDEO
-    ], {
-      cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK//后置摄像头
-    })
-
-    const filePath = getContext().filesDir + '/' + util.generateRandomUUID()
-    const file = fileIo.openSync(result.resultUri, fileIo.OpenMode.READ_ONLY)
-    let extendName = 'jpg'
-    let messTpye = MessageTypeEnum.IMAGE
-    let messContent = '[图片]'
-    // 注意系统GUB,类型判断不上
-    if (result.mediaType === 'video') {
-      extendName = 'mp4'
-      messTpye = MessageTypeEnum.VIDEO
-      messContent = '[视频]'
-    }
-    // 考培文件
-    fileIo.copyFileSync(file.fd, filePath + extendName)
-    fileIo.closeSync(file.fd)
-    this.sendImageMessage([new MessageInfoModel({
-      connectUser: this.talkUser,
-      sendUser: this.currentUser,
-      sourceFilePath: filePath + extendName,
-      messageType: messTpye,
-      messageContent: messContent
-    } as MessageInfo)])
-
-    AlertDialog.show({
-      message: JSON.stringify(result)
-    })
-  }
-
-  // 发送图片
-  async sendPhoto() {
-    //   打开相册
-    const photo = new picker.PhotoViewPicker()
-    let result = await photo.select({
-      MIMEType: picker.PhotoViewMIMETypes.IMAGE_TYPE,
-      maxSelectNumber: 9
-    })
-
-    AlertDialog.show({ message: JSON.stringify(result.photoUris) })
-    let messList: MessageInfoModel[] = []
-
-    result.photoUris.forEach(url => {
-      const file = fileIo.openSync(url, fileIo.OpenMode.READ_ONLY)
-      const newFileName = getContext().filesDir + "/" + util.generateRandomUUID() + '.jpg'
-      fileIo.copyFileSync(file.fd, newFileName)
-      // 发了一张图片，一个消息
-      messList.push(
-        new MessageInfoModel({
-          connectUser: this.talkUser,
-          sendUser: this.currentUser,
-          sourceFilePath: newFileName,
-          messageType: MessageTypeEnum.IMAGE,
-          messageContent: "[图片]"
-        } as MessageInfo)
-      )
-      fileIo.closeSync(file.fd) //关闭相册的读取
-      //   循环结束之后 发送消息 发送一个列表
-      this.sendImageMessage(messList)
-      animateTo({ duration: 150 }, () => {
-        this.showBottomCard = false
-      })
-
-    })
-  }
-
-  aboutToAppear(): void {
-    this.getScreenWidth()
-    AudioCapturer.init()
-  }
-
-  aboutToDisappear(): void {
-    AudioCapturer.release()
-  }
-
-  async getScreenWidth() {
-    const result = await display.getAllDisplays()
-    if (result && result.length) {
-      this.screenWidth = px2vp(result[0].width) //记录宽度
-      this.screenHeight = px2vp(result[0].height) //记录高度
-    }
-  }
-
-  // 检查权限
-  checkPermission() {
-    const result = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
-    const manger = abilityAccessCtrl.createAtManager() //创建一个manger
-    const status = manger.checkAccessTokenSync(result.appInfo.accessTokenId, "ohos.permission.MICROPHONE")
-    if (status === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
-      promptAction.showToast({ message: '状态是拒绝' })
-      //无法再次申请因而无法录音，需要手动打开权限
-      // ability 传参 打开设置页面
-      const context = getContext() as common.UIAbilityContext
-      context.startAbility({
-        bundleName: "com.huawei.hmos.settings",
-        abilityName: "com.huawei.hmos.settings.MainAbility",
-        uri: "application_info_entry",
-        parameters: {
-          pushParams: result.name //打开具体设置
-        }
-      })
-
-    } else {
-      this.isShowVoiceBuilder = true
-      this.beginCollectVoice()
-
-    }
-  }
-
-  // 开始录音
-  beginCollectVoice() {
-    this.tempAudioPath = FileCommon.createAudioFile() //创建音频文件
-    AudioCapturer.start(this.tempAudioPath) //开始录音了
-    this.startTime()
-  }
-
-  // 松手逻辑
-  releaseFinger() {
-    this.isShowVoiceBuilder = false
-    this.endTime()
-    AudioCapturer.stop()
-    if (this.voiceState === VoiceRecordEnum.Cancel) {
-      //   取消发生
-      FileCommon.delFilePath(this.tempAudioPath) //删除文件
-      this.duration = 0
-    }
-    if (this.voiceState === VoiceRecordEnum.Recording) {
-      FileCommon.delFilePath(this.tempAudioPath) //删除文件
-      if (this.duration < 1) {
-        promptAction.showToast({
-          message: '音频时长过短'
-        })
-        return
-      }
-      // 发送语音
-      this.sendAudio()
-    }
-    if (this.voiceState === VoiceRecordEnum.Transfer) {
-      // 转化文本
-    }
-    // 无论是什么状态，最终到要回到正常状态
-    this.voiceState = VoiceRecordEnum.Recording
-    promptAction.showToast({ message: '计时' + this.duration })
-    //  该发消息了
-
-  }
-
-  //发送语音
-  sendAudio() {
-    let newMessage = new MessageInfoModel({
-      sourceDuration: this.duration, //时长
-      messageContent: `[语音]${this.duration}'`,
-      messageType: MessageTypeEnum.AUDIO,
-      sendUser: this.currentUser,
-      connectUser: this.talkUser,
-      sourceFilePath: this.tempAudioPath,
-    } as MessageInfo)
-    this.sendAudioMessage(newMessage)
-    this.duration = 0 //重置时长
-    this.tempAudioPath = '' //清除路径
-  }
-
-  startTime() {
-    this.timer = setInterval(() => {
-      this.duration++
-    }, 1000)
-  }
-
-  endTime() {
-    clearInterval(this.timer)
-  }
 
   build() {
     Column() {
@@ -415,8 +417,8 @@ struct BottomInput {
                       this.voiceState = VoiceRecordEnum.Cancel
                     } else {
                       this.voiceState = VoiceRecordEnum.Transfer
-                      VoiceTransfer.VoiceToText(this.tempAudioPath,(res)=>{
-                        this.asrResult=res.result //
+                      VoiceTransfer.VoiceToText(this.tempAudioPath, (res) => {
+                        this.asrResult = res.result //
 
                       })
                     }

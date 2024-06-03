@@ -9,3 +9,5 @@ export interface BlueData {
   data?: string[] // 例如wifi=》 [ssid,pwd]
 }
 
+export const WIFI_CONNECT = 'WIFI_CONNECT'
+

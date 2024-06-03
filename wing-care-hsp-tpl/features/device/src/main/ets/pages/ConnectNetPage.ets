@@ -1,4 +1,10 @@
-import { ResManager } from '@hm/basic/Index'
+import { ResManager, RouterConfig } from '@hm/basic/Index'
+import { promptAction, router } from '@kit.ArkUI'
+import { WifiAccount } from '../model'
+import { Log } from '@abner/log'
+import { BlueData, WIFI_CONNECT } from '../utils/Device'
+import { EcBlueDevice } from '../utils/EcBlueDevice'
+import { emitter } from '@kit.BasicServicesKit'
 
 @Entry
 @Component
@@ -12,23 +18,101 @@ struct ConnectNetPage {
   @State
   time: number = 10
   timer: number = -1
+  @State
+  wifi: WifiAccount = {
+    ssid: '',
+    pwd: ''
+  }
 
   run() {
     this.timer = setInterval(() => {
-      if (this.time === 0) return clearInterval(this.timer)
+      if (this.time === 0) {
+        router.pushUrl({
+          url: RouterConfig.DEVICE_DOOR_CONNECT_TIP_URL,
+          params: {
+            tips: 2
+          }
+        })
+
+        return clearInterval(this.timer)
+      }
+
       this.time--
     }, 1000)
   }
 
   // 开始连接网络
   start() {
+
     this.linking = true
     this.run()
+    // 监听
+    this.onConnect()
+    // 发送wifi账号
+    this.sendWifi()
+  }
+
+  onConnect() {
+    emitter.on(WIFI_CONNECT, (res) => {
+      clearInterval(this.timer)
+      if (res.data?.status === 200) {
+        router.pushUrl({
+          url: RouterConfig.DEVICE_DOOR_CONNECT_TIP_URL,
+          params: {
+            tips: 1
+          }
+        })
+      } else {
+        router.pushUrl({
+          url: RouterConfig.DEVICE_DOOR_CONNECT_TIP_URL,
+          params: {
+            tips: 2
+          }
+        })
+      }
+    })
+  }
+
+  async sendWifi() {
+    try {
+      // 数据
+      const data: BlueData = {
+        command: 'wifi',
+        data: [this.wifi.ssid, this.wifi.pwd]
+      }
+      let res: boolean = await EcBlueDevice.sendWifiData(data)
+      if (res) {
+        promptAction.showToast({
+          message: "发送信息成功"
+        })
+      } else {
+        promptAction.showToast({
+          message: "发送信息失败"
+        })
+      }
+      // ...
+    } catch (e) {
+      Log.error(e)
+    }
+
+  }
+
+  onPageShow(): void {
+    const params: object = router.getParams()
+    Log.warn(params)
+
+    if (params && params['ssid']) {
+      this.wifi.ssid = params['ssid']
+    }
   }
 
   // aboutToAppear() {
   //   this.run()
   // }
+
+  aboutToDisappear(): void {
+    emitter.off('WIFI_CONNECT')
+  }
 
   build() {
     Navigation() {
@@ -62,7 +146,7 @@ struct ConnectNetPage {
           List() {
             ListItem() {
               Row() {
-                Text('YJY-5G')
+                Text(this.wifi.ssid || '请选择 WIFI')
                   .fontColor(ResManager.EC_MID_19)
                   .fontSize(ResManager.EC_MODULE_TITLE_FS)
                   .fontWeight(500)
@@ -76,6 +160,9 @@ struct ConnectNetPage {
               .padding({ top: 14, bottom: 14 })
               .justifyContent(FlexAlign.SpaceBetween)
               .onClick(() => {
+                router.pushUrl({
+                  url: RouterConfig.DEVICE_DOOR_SCAN_WIFI_URL
+                })
               })
             }
 
@@ -87,7 +174,10 @@ struct ConnectNetPage {
                   .fontWeight(500)
 
                 Row() {
-                  TextInput({ placeholder: '请输入密码' })
+                  TextInput({ placeholder: '请输入密码', text: this.wifi.pwd })
+                    .onChange((value) => {
+                      this.wifi.pwd = value
+                    })
                     .placeholderColor(ResManager.EC_MID_99)
                     .placeholderFont({ size: ResManager.EC_NORMAL_FS })
                     .backgroundColor('#fff')
@@ -120,10 +210,13 @@ struct ConnectNetPage {
           .margin({ top: 50 })
           .width(230)
           .backgroundColor(ResManager.EC_MAIN_COLOR)
+          .enabled(!!(this.wifi.ssid && this.wifi.pwd))
           .onClick(() => {
             this.start()
           })
-      } else {
+      }
+      else {
+        // 链接页面
         // 连接中...
         Column({ space: 5 }) {
           Text() {

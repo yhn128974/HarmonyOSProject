@@ -1,11 +1,18 @@
 import { EcDialogTips } from '@itheima/wing-care'
-import { ResManager } from '@hm/basic/Index'
+import { ResManager, RouterConfig } from '@hm/basic/Index'
+import { Log } from '@abner/log'
+import wifiManager from '@ohos.wifiManager';
+import { ecWifi } from '../utils';
+import { router } from '@kit.ArkUI';
 
 @Entry
 @Component
 struct NetDoorPage {
   @StorageProp('topHeight')
   topHeight: number = 0
+  @State
+
+  isOk: boolean = false
 
   // 1. 未闪烁说明
   @Builder
@@ -110,8 +117,22 @@ struct NetDoorPage {
   })
 
   aboutToAppear() {
-    // this.notFoundDialog.open()
+
+
     this.wifiDialog.open()
+  }
+
+  next() {
+    if (this.isOk) {
+      const isOpen = ecWifi.isWifiOpen()
+      if (isOpen) {
+        router.pushUrl({
+          url: RouterConfig.DEVICE_DOOR_NET_CONNECT_URL
+        })
+      } else {
+        this.wifiDialog.open()
+      }
+    }
   }
 
   build() {
@@ -148,6 +169,7 @@ struct NetDoorPage {
               Checkbox()
                 .select(true)
                 .selectedColor(ResManager.EC_MAIN_COLOR)
+                .select($$this.isOk)
               Text('指示灯闪烁')
                 .fontColor(ResManager.EC_MID_19)
                 .fontSize(18)
@@ -156,9 +178,13 @@ struct NetDoorPage {
             .margin({ bottom: 16 })
 
             Button('下一步')
+              .enabled(this.isOk)
               .width(230)
               .margin({ bottom: 25 })
               .backgroundColor(ResManager.EC_MAIN_COLOR)
+              .onClick(() => {
+                this.next()
+              })
 
             Text('未看到指示灯闪烁')
               .fontColor(ResManager.EC_MAIN_COLOR)

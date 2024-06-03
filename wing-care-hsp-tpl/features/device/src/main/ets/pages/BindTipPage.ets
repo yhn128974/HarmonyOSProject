@@ -22,9 +22,9 @@ struct BindTipPage {
         EcDeviceTip({
           type: 'success',
           message: '绑定成功',
-          btnText: this.tips === 1 ? '去查看' : '去配网',
+          btnText: this.tips === 1 ? '去配网' : '去查看',
           closeUrl: '',
-          url: this.tips === 1 ? RouterConfig.DEVICE_MY_URL : RouterConfig.DEVICE_DOOR_NET_URL
+          url: this.tips === 1 ? RouterConfig.DEVICE_DOOR_NET_URL : RouterConfig.DEVICE_MY_URL
         })
       } else {
         EcDeviceTip({ type: 'fail', message: '绑定失败', btnText: '重新绑定' })

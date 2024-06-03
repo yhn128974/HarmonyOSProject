@@ -1,7 +1,9 @@
 import { Log } from '@abner/log';
 import { ble, constant } from '@kit.ConnectivityKit';
 import { promptAction } from '@kit.ArkUI';
-import { DoorLinkCallback } from './Device';
+import { BlueData, DoorLinkCallback, WIFI_CONNECT } from './Device';
+import { util } from '@kit.ArkTS';
+import { emitter } from '@kit.BasicServicesKit';
 
 interface ScanFilter {
   type: 'mac' | 'name'
@@ -101,7 +103,6 @@ export class EcBlueDevice {
         // 2. 发现服务
         try {
           const res = await EcBlueDevice.dev?.getServices()
-
           // 查找自定义读写服务
           const ser = res?.find(item => item.serviceUuid.startsWith('0000AE30'))
 
@@ -112,8 +113,18 @@ export class EcBlueDevice {
             // 2. 通知特征值=> 设备给手机发送数据
             const ntChar = ser.characteristics.find(item => item.characteristicUuid.startsWith('0000AE04'))
             // 监听特征值变化，设备通信
+            const td = util.TextDecoder.create()
             EcBlueDevice.dev?.on('BLECharacteristicChange', (res) => {
 
+              const buff = new Uint8Array(res.characteristicValue)
+              const result = JSON.parse(td.decodeWithStream(buff)) as BlueData
+              if (result.command === 'wifi') {
+                emitter.emit(WIFI_CONNECT, {
+                  data: {
+                    status: result.status
+                  }
+                })
+              }
 
             })
             // 向服务端发送设置通知此特征值请求
@@ -144,5 +155,31 @@ export class EcBlueDevice {
       EcBlueDevice.dev.close()
       EcBlueDevice.dev = null
     }
+  }
+
+  static async sendWifiData(prams: BlueData) {
+    try {
+
+      // 将数据转换为二进制码
+      const encoder = new util.TextEncoder();
+      const uint8Array = encoder.encodeInto(JSON.stringify(prams));
+      //发送数据给设备
+      await EcBlueDevice.dev?.writeCharacteristicValue({
+        serviceUuid: EcBlueDevice.wrChar!.serviceUuid,
+        characteristicUuid: EcBlueDevice.wrChar!.characteristicUuid,
+        characteristicValue: uint8Array.buffer,
+        descriptors: []
+      }, ble.GattWriteType.WRITE)
+
+      promptAction.showToast({ message: '发送账号成功' })
+
+      return true
+      // ...
+    } catch (e) {
+      Log.error(e)
+      return false
+
+    }
+
   }
 }

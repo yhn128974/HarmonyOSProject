@@ -1,5 +1,9 @@
-import { ResManager } from '@hm/basic/Index'
+import { ecBlue, ResManager } from '@hm/basic/Index'
 import router from '@ohos.router'
+import { DeviceStatusData } from '../../viewmodel/DeviceModel'
+import { getDeviceStatusApi } from '../../api'
+import { deviceParamsStore, EcBlueDevice } from '../../utils'
+import { EcLoading } from '@itheima/wing-care'
 
 class ControlItem {
   name: string = ''
@@ -9,8 +13,11 @@ class ControlItem {
 @Entry
 @Component
 struct DoorControlPage {
+  @State
+  deviceStatus: DeviceStatusData | null = null
   @StorageProp('topHeight')
   topHeight: number = 0
+  isLink: boolean = false
   // 控制列表
   list: ControlItem[] = [
     { name: '蓝牙开门', url: 'pages/device/access_control/BluetoothOpenPage' },
@@ -18,6 +25,48 @@ struct DoorControlPage {
     { name: '临时密码', url: 'pages/device/access_control/TempPasswordPage' },
     { name: '开门记录', url: 'pages/device/access_control/OpeningRecordPage' },
   ]
+  loading: CustomDialogController = new CustomDialogController({
+    builder: EcLoading({ tip: '连接设备中...' }),
+    customStyle: true,
+    autoCancel: false,
+    alignment: DialogAlignment.Center
+  })
+
+  aboutToAppear(): void {
+    this.getDeviceStatus()
+    this.checkAndConnect()
+  }
+
+  aboutToDisappear(): void {
+    EcBlueDevice.destroy()
+  }
+
+  async getDeviceStatus() {
+    const data = await getDeviceStatusApi(deviceParamsStore.getParams().iotId!)
+    this.deviceStatus = data
+  }
+
+  checkAndConnect() {
+    ecBlue.checkBluePermission(() => {
+      this.loading.open()
+      EcBlueDevice.scanDevice({
+        type: "mac",
+        value: deviceParamsStore.getParams()
+          .nodeId!
+      }, (list) => {
+        if (list.length > 0) {
+          // 连接设备
+          EcBlueDevice.connectDoorDevice(list[0].deviceId, () => {
+            this.isLink = true
+            this.loading.close()
+          })
+        } else {
+          AlertDialog.show({ title: '提示', message: '未找到设备' })
+          this.loading.close()
+        }
+      })
+    })
+  }
 
   @Builder
   cellItem(title: string, url: string = '') {
@@ -42,11 +91,11 @@ struct DoorControlPage {
     Navigation() {
       //  1. 设备信息
       Column({ space: 8 }) {
-        Text('smoke alarm 002')
+        Text(this.deviceStatus?.name)
           .fontColor(ResManager.EC_MID_19)
           .fontSize(ResManager.EC_MODULE_TITLE_FS)
           .margin({ top: 20 })
-        Text('在线')
+        Text(this.deviceStatus?.status === 'ONLINE' ? '在线' : '离线')
           .fontColor('#fff')
           .fontSize(ResManager.EC_SMALL_FS)
           .padding({

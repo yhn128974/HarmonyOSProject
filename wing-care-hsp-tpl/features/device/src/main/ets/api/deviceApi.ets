@@ -6,6 +6,7 @@
 import { UnBindProductItem } from '../model'
 import { request } from '@hm/basic'
 import { http } from '@kit.NetworkKit'
+import { DeviceStatusData } from '../viewmodel/DeviceModel'
 
 export function getUnbindDeviceListApi() {
   return request<UnBindProductItem[]>({ url: '/employee/iot/deviceTree' })
@@ -25,4 +26,8 @@ export function unbindDeviceApi(iotId: string) {
 
 export function bindDeviceApi(iotId: string) {
   return request({ url: `/employee/iot/bindingDevice/${iotId}`, method: 'put' })
+}
+
+export function getDeviceStatusApi(iotId: string) {
+  return request<DeviceStatusData>({ url: `/employee/iot/getDeviceStatus/${iotId}` })
 }

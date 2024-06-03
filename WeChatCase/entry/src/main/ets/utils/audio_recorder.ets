@@ -7,10 +7,10 @@ export class AudioCapturer {
   static audioCapturer: audio.AudioCapturer
   // 录用配置
   static audioStreamInfo: audio.AudioStreamInfo = {
-    samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_16000,
-    channels: audio.AudioChannel.CHANNEL_1,
-    sampleFormat: audio.AudioSampleFormat.SAMPLE_FORMAT_S16LE,
-    encodingType: audio.AudioEncodingType.ENCODING_TYPE_RAW
+    samplingRate: audio.AudioSamplingRate.SAMPLE_RATE_16000, // 采样率
+    channels: audio.AudioChannel.CHANNEL_1, // 通道
+    sampleFormat: audio.AudioSampleFormat.SAMPLE_FORMAT_S16LE, // 采样格式
+    encodingType: audio.AudioEncodingType.ENCODING_TYPE_RAW// 编码格式
   }
   static audioCapturerInfo: audio.AudioCapturerInfo = {
     source: audio.SourceType.SOURCE_TYPE_MIC, // 音源类型
@@ -27,26 +27,36 @@ export class AudioCapturer {
     });
   }
 
+  // 长按 手势开始录制
   static async start(filePath: string) {
     try {
-      if (!AudioCapturer.audioCapturer) return
+      if (!AudioCapturer.audioCapturer)
+        return
       AudioCapturer.recordIng = true
       await AudioCapturer.audioCapturer.start()
 
       // 开始录音
       let file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE); // 如果文件不存在则创建文件
+      // 文件路径
       let fd = file.fd;
+
       let statFile = fileIo.statSync(fd)
       let bufferSize: number = statFile.size
+
       while (AudioCapturer.recordIng) {
 
         let size = await AudioCapturer.audioCapturer.getBufferSize();
         let buffer = await AudioCapturer.audioCapturer.read(size, true);
+
         let options: FileOptions = {
           offset: bufferSize,
           length: buffer.byteLength
         };
-        fileIo.writeSync(fd, buffer, options) // 写入文件
+
+        if (buffer) {
+          fileIo.writeSync(fd, buffer, options) // 写入文件
+          bufferSize += buffer.byteLength //偏移量
+        }
 
         emitter.emit("onBuffer", {
           data: {
@@ -54,7 +64,7 @@ export class AudioCapturer {
           }
         })
 
-        bufferSize += buffer.byteLength //偏移量
+
       }
     } catch (error) {
       AlertDialog.show({
@@ -64,16 +74,18 @@ export class AudioCapturer {
 
   }
 
+  //
   static async stop() {
     AudioCapturer.recordIng = false
+    //
     if (AudioCapturer.audioCapturer) {
       // 只有采集器状态为STATE_RUNNING或STATE_PAUSED的时候才可以停止
       if (AudioCapturer.audioCapturer.state === audio.AudioState.STATE_RUNNING ||
         AudioCapturer.audioCapturer.state === audio.AudioState.STATE_PAUSED
       ) {
-
         await AudioCapturer.audioCapturer.stop(); // 停止采集
       }
+
 
     }
   }

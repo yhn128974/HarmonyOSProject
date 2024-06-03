@@ -17,6 +17,7 @@ export class AudioRenderer {
     usage: audio.StreamUsage.STREAM_USAGE_VOICE_COMMUNICATION
     // 场景
   }
+
   // 创建播放器的参数准备好了
   static audioRendererOptions: audio.AudioRendererOptions = {
     streamInfo: AudioRenderer.audioStreamInfo,
@@ -25,10 +26,12 @@ export class AudioRenderer {
   // 初始化方法
   static async init() {
     if (!AudioRenderer.renderModel) {
-      // 创建实例
+      // 创建AudioRenderer实例
       AudioRenderer.renderModel = await audio.createAudioRenderer(AudioRenderer.audioRendererOptions)
+
     }
   }
+
   // 音频的释放和暂停
   static async stop() {
     if (AudioRenderer.renderModel) {
@@ -50,15 +53,18 @@ export class AudioRenderer {
         // 不包含的情况下 此时就不能播了
         return
       }
+
       // 此时可以播
       await AudioRenderer.renderModel.start() // 启动播放
+
       // 读写文件 filePath的文件 一段段的读取 读完拉到 关闭文件 停止播放
       const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_ONLY) // 读这个文件的buffer  一段段的读取 1280
-
       const stat = fileIo.statSync(file.fd) // 详细信息
       const bufferSize = await AudioRenderer.renderModel.getBufferSize() // 获取缓冲区的长度
+
       let buf = new ArrayBuffer(bufferSize) // 创建一个缓冲区对象 长度是音频采集器长度的长度
       let totalSize = 0 // 总量值
+
       while (totalSize < stat.size) {
         fileIo.readSync(file.fd, buf, {
           offset: totalSize,
@@ -72,10 +78,12 @@ export class AudioRenderer {
         // 此时要继续
         totalSize += bufferSize
       }
+
       // 关闭文件
       fileIo.closeSync(file.fd)
       AudioRenderer.stop() // 关闭
       callback && callback()
+
     }
   }
 

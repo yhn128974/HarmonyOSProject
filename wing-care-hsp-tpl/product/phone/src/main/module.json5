@@ -23,14 +23,17 @@
         "name": "ohos.permission.ACCESS_BLUETOOTH",
         "reason": "$string:app_name",
         "usedScene": {
-          "abilities": [ "EntryAbility"],
-          "when":"inuse"
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
         }
       },
       {
         "name": "ohos.permission.GET_WIFI_INFO"
       },
       {
+        // 线性震动传感器
         "name": "ohos.permission.ACCELEROMETER"
       }
     ],
