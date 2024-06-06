@@ -1,0 +1,12 @@
+{
+  "src": [
+    "pages/Account/Login",
+    "pages/Account/UserCenter",
+    "pages/Classify/PaperList",
+    "pages/Classify/ClassifyList",
+    "pages/Home/Home",
+    "pages/Answer/UserAnswerResult",
+    "pages/Answer/AnswerDetail",
+    "pages/Index"
+  ]
+}

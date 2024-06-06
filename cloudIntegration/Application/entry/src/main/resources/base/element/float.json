@@ -1,0 +1,80 @@
+{
+  "float": [
+    {
+      "name": "main_title_font_size",
+      "value": "25fp"
+    },
+    {
+      "name": "navigation_font_size",
+      "value": "20fp"
+    },
+    {
+      "name": "body_font_size",
+      "value": "15fp"
+    },
+    {
+      "name": "list_item_font_size",
+      "value": "12fp"
+    },
+    {
+      "name": "title_immersive_font_size",
+      "value": "19fp"
+    },
+    {
+      "name": "detail_immersive_font_size",
+      "value": "16fp"
+    },
+    {
+      "name": "detail_immersive_margin_top",
+      "value": "6vp"
+    },
+    {
+      "name": "detail_immersive_opacity",
+      "value": "0.66"
+    },
+    {
+      "name": "column_padding",
+      "value": "12vp"
+    },
+    {
+      "name": "font_size",
+      "value": "14fp"
+    },
+    {
+      "name": "card_title_font_size",
+      "value": "14fp"
+    },
+    {
+      "name": "item_font_size",
+      "value": "12fp"
+    },
+    {
+      "name": "maximum_padding",
+      "value": "12vp"
+    },
+    {
+      "name": "item_margin_top",
+      "value": "2vp"
+    },
+    {
+      "name": "image_margin_bottom",
+      "value": "8vp"
+    },
+    {
+      "name": "info_column_padding",
+      "value": "12vp"
+    },
+    {
+      "name": "info_column_width",
+      "value": "106vp"
+    },
+    {
+      "name": "info_column_height",
+      "value": "120vp"
+    },
+    {
+      "name": "image_border_radius",
+      "value": "8vp"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "first_color",
+      "value": "#FFA621"
+    },
+    {
+      "name": "second_color",
+      "value": "#929DCA"
+    },
+    {
+      "name": "third_color",
+      "value": "#EA8F50"
+    },
+    {
+      "name": "error_full_color",
+      "value": "#f83b43"
+    },
+    {
+      "name": "error_half_color",
+      "value": "#fff2f2"
+    },
+    {
+      "name": "right_full_color",
+      "value": "#00cc9f"
+    },
+    {
+      "name": "right_half_color",
+      "value": "#f3fffc"
+    },
+    {
+      "name": "gray_full_color",
+      "value": "#d9d9d9"
+    },
+    {
+      "name": "gray_light_color",
+      "value": "#fafcff"
+    },
+    {
+      "name": "blue_light_color",
+      "value": "#449ef8"
+    },
+    {
+      "name": "white",
+      "value": "#ffffff"
+    },
+    {
+      "name": "black",
+      "value": "#000000"
+    },
+    {
+      "name": "body_color",
+      "value": "#E9F2FF"
+    },
+    {
+      "name": "text_main_color",
+      "value": "#191919"
+    },
+    {
+      "name": "text_active_color",
+      "value": "#1698CE"
+    },
+    {
+      "name": "text_second_color",
+      "value": "#545454"
+    },
+    {
+      "name": "gray_color",
+      "value": "#979797"
+    },
+    {
+      "name": "send_code_color",
+      "value": "#2C80FF"
+    },
+    {
+      "name": "send_disable_color",
+      "value": "#FF9EA0A2"
+    },
+    {
+      "name": "option_item_color",
+      "value": "#F9F9F9"
+    },
+    {
+      "name": "item_title_font",
+      "value": "#E6000000"
+    },
+    {
+      "name": "information_title_font",
+      "value": "#E6000000"
+    },
+    {
+      "name": "title_font",
+      "value": "#E5FFFFFF"
+    },
+    {
+      "name": "item_text_font",
+      "value": "#99000000"
+    },
+    {
+      "name": "image_info_background",
+      "value": "#FFFFFF"
+    }
+  ]
+}
