@@ -52,6 +52,7 @@ export default struct Location {
         altitude: result.altitude,
         //准确性
         accuracy: result.accuracy,
+        //
         speed: result.speed,
         // 时间戳
         timeStamp: result.timeStamp,
@@ -74,6 +75,7 @@ export default struct Location {
         },
         zoom: 10
       })
+
       this.mapController?.moveCamera(cameraUpdate)
 
       //   利用花瓣地图的浮层
@@ -85,6 +87,7 @@ export default struct Location {
         title: '您当前的位置',
         clickable: true
       })
+      // 添加一个圆圈
       this.mapController?.addCircle({
         radius: 500,
         center: {

@@ -22,7 +22,6 @@ let mContext = getContext(this) as common.Context;
 @Preview
 @Component
 struct BottomInput {
-
   @Provide asrResult: string = ''
   @StorageProp(WeChat_CurrentUserKey)
   currentUser: UserInfoModel = new UserInfoModel({} as UserInfo)
@@ -96,7 +95,6 @@ struct BottomInput {
     }]
   @State
   showBottomCard: boolean = false // 显示底部
-
   // 发送文本
   sentTextMessage: (content: string) => void = () => {
   }
@@ -189,7 +187,6 @@ struct BottomInput {
 
     })
   }
-
 
   async getScreenWidth() {
     const result = await display.getAllDisplays()
@@ -369,7 +366,6 @@ struct BottomInput {
     })
 
   }
-
 
   build() {
     Column() {

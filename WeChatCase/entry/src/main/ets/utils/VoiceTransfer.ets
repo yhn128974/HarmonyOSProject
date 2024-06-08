@@ -14,6 +14,7 @@ export class VoiceTransfer {
     "locate": 'CN',
     "name": 'EngineName'
   };
+  // 指定初始化参数
   private static voiceInitParamsInfo: textToSpeech.CreateEngineParams = {
     language: 'zh-CN',
     person: 0,
@@ -34,6 +35,7 @@ export class VoiceTransfer {
       "languageContext": 'zh-CN',
       "audioType": "pcm"
     }
+    //播放参数
     let speakParams: textToSpeech.SpeakParams = {
       requestId: util.generateRandomUUID(),
       extraParams: extraParam
@@ -94,7 +96,9 @@ export class VoiceTransfer {
         soundChannel: 1,
         sampleBit: 16
       };
+
       let extraParam: Record<string, Object> = { "vadBegin": 2000, "vadEnd": 3000, "maxAudioDuration": 60000 };
+
       let recognizerParams: speechRecognizer.StartParams = {
         sessionId: util.generateRandomUUID(),
         audioInfo: audioParam,
@@ -117,6 +121,7 @@ export class VoiceTransfer {
 
     let file = fileIo.openSync(path, fileIo.OpenMode.READ_WRITE); // 读文件
     // let stat = fileIo.statSync(file.fd)
+
     try {
       let buf: ArrayBuffer = new ArrayBuffer(1280);
       let totalSize: number = 0
@@ -126,6 +131,7 @@ export class VoiceTransfer {
           length: 1280
         })
         let unit8Array: Uint8Array = new Uint8Array(buf);
+
         VoiceTransfer.asrEngine.writeAudio(VoiceTransfer.sessionId, unit8Array);
         // 这里必须加延迟才可以
         await new Promise<boolean>((resolve) => {

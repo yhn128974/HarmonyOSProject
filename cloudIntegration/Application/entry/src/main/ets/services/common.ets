@@ -11,22 +11,19 @@ export class CloudDataBase {
         // 获取schema的JSON对象
         const currentContext = getContext()
         const res = await currentContext.resourceManager.getRawFileContent('schema.json')
-        let json = buffer.from(res as ArrayBufferLike).toString('utf-8')
+        let json:string = buffer.from(res as ArrayBufferLike).toString('utf-8')
 
         //   获取数据库对象
-        return CloudDataBase.currentDataBase = cloud.database({
+         CloudDataBase.currentDataBase = cloud.database({
           objectTypeInfo: JSON.parse(json) as ObjectTypeInfo,
           zoneName: 'question'
         })
 
-      } catch (e) {
-        promptAction.showToast({
-          message: JSON.stringify(e.message)
-        })
+      } catch (error) {
+        promptAction.showToast({ message: error.message })
       }
 
-
     }
-
+      return CloudDataBase.currentDataBase
   }
 }
