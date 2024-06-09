@@ -7,3 +7,5 @@ export  * from './question-classify'
 export * from './paper'
 
 export * from './question_info'
+
+export * from './question_user_all'
