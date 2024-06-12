@@ -415,7 +415,6 @@ struct BottomInput {
                       this.voiceState = VoiceRecordEnum.Transfer
                       VoiceTransfer.VoiceToText(this.tempAudioPath, (res) => {
                         this.asrResult = res.result //
-
                       })
                     }
                   }

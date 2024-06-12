@@ -1,29 +1,30 @@
 import cloud, { Database, ObjectTypeInfo } from '@hw-agconnect/cloud'
-import buffer from '@ohos.buffer'
-import promptAction from '@ohos.promptAction'
+import { buffer } from '@kit.ArkTS'
+import { promptAction } from '@kit.ArkUI'
 
+// 数据库的导出类
 export class CloudDataBase {
+  // 云数据库操作类
   static currentDataBase: Database | null
 
+  // 获取云数据库的方法
   static async getCloudDataBase() {
     if (!CloudDataBase.currentDataBase) {
       try {
-        // 获取schema的JSON对象
-        const currentContext = getContext()
-        const res = await currentContext.resourceManager.getRawFileContent('schema.json')
-        let json:string = buffer.from(res as ArrayBufferLike).toString('utf-8')
-
-        //   获取数据库对象
-         CloudDataBase.currentDataBase = cloud.database({
+        const context = getContext()
+        const value = await context.resourceManager.getRawFileContent("schema.json")
+        let json = buffer.from(value as ArrayBufferLike).toString("utf-8")
+        // schema的转化得来的
+        CloudDataBase.currentDataBase = cloud.database({
           objectTypeInfo: JSON.parse(json) as ObjectTypeInfo,
-          zoneName: 'question'
+          zoneName: "question"
         })
-
-      } catch (error) {
+        // 赋值云数据库
+      }catch(error) {
         promptAction.showToast({ message: error.message })
       }
 
     }
-      return CloudDataBase.currentDataBase
+    return CloudDataBase.currentDataBase
   }
 }

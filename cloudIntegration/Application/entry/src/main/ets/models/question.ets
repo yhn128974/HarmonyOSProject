@@ -38,7 +38,6 @@ export class  QuestionInfo {
 // 试卷用户回答
 export class  QuestionUserAll {
   static className: string = "question_user_all"
-
   id: number | null = null
   classify_id: number = 0
   paper_id: number = 0
@@ -53,7 +52,6 @@ export class  QuestionUserAll {
 // 用户回答的每个题目的详情
 export class  QuestionUserAnswer {
   static className: string = "question_user_answer"
-
   id: number | null = null
   classify_id: number = 0
   question_info_id: number = 0

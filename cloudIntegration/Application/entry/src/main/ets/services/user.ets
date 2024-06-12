@@ -1,24 +1,25 @@
+// UserInfo 增删改查
+import { CloudDataBase } from '.'
 import { UserInfo } from '../models'
-import { CloudDataBase } from './common'
 
 export class UserService {
-  //
-  static async getUserInfoUserID(UserId: string) {
+  // 获取用户的信息
+  static async getUserInfoUserId(userId: string) {
     const dataBase = await CloudDataBase.getCloudDataBase()
-
-    const result = await dataBase?.collection<UserInfo>(UserInfo)//拿到用户表
-      .query()//查询
+    const result = await dataBase?.collection<UserInfo>(UserInfo)
+      .query()
       .limit(1)
-      .equalTo("user_id", UserId)
+      .equalTo("user_id", userId)
       .get()
-    return result
+    return result // 返回拿到的结果
+    // 拿到了用户的这张表
   }
 
-  //   更新数据表
+  // 更新用户的信息
   static async updateUserInfo(user: UserInfo) {
     const dataBase = await CloudDataBase.getCloudDataBase()
     const result = await dataBase?.collection<UserInfo>(UserInfo)
-      .upsert(user) //插入数据字段
+      .upsert(user)
     return result
   }
 }

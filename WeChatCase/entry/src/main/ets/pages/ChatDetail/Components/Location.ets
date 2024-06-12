@@ -33,8 +33,6 @@ export default struct Location {
         this.mapController.setMyLocationControlsEnabled(true) //允许我的定位组件显示
         // 此时此刻就可以拿到定位
         this.getLocation()
-
-
       }
     };
   }
@@ -42,12 +40,10 @@ export default struct Location {
   async getLocation() {
     try {
       const result = await geoLocationManager.getCurrentLocation()
+
       this.mapController?.setMyLocation({
-
         latitude: result.latitude,
-
         longitude: result.longitude,
-
         // 高度
         altitude: result.altitude,
         //准确性
@@ -59,13 +55,13 @@ export default struct Location {
         //
         direction: result.direction,
         // 通用场景
-        timeSinceBoot: result.timeSinceBoot
-
-
+        timeSinceBoot: result.timeSinceBoot,
+        altitudeAccuracy: 0,
+        speedAccuracy: 0,
+        directionAccuracy: 0,
+        uncertaintyOfTimeSinceBoot: 0,
+        sourceType: 0
       })
-      // AlertDialog.show({
-      //   message: JSON.stringify(result)
-      // })
 
       //  地图上的位置实际上是照相机的位置
       let cameraUpdate: map.CameraUpdate = map.newCameraPosition({
@@ -98,19 +94,17 @@ export default struct Location {
       })
 
       // 要拿到经纬度的具体的街道的位置
-      const res =await geoLocationManager.getAddressesFromLocation({
+      const res = await geoLocationManager.getAddressesFromLocation({
         latitude: result.latitude,
         longitude: result.longitude,
       })
       if (res.length) {
-        this.currentAddress=res[0].placeName as string
+        this.currentAddress = res[0].placeName as string
       }
       AlertDialog.show({
         message: JSON.stringify(res)
       })
-    }
-
-    catch (error) {
+    } catch (error) {
       AlertDialog.show({
         message: JSON.stringify(error.message)
       })
@@ -124,7 +118,6 @@ export default struct Location {
       MapComponent({ mapOptions: this.mapOption, mapCallback: this.callback })
         .width('100%')
         .height('100%');
-
     }.height('100%').width('100%')
   }
 }

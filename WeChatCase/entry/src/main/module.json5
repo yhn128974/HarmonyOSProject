@@ -14,6 +14,16 @@
     "pages": "$profile:main_pages",
     "requestPermissions": [
       {
+        "name": 'ohos.permission.LOCATION_IN_BACKGROUND',
+        "reason": "$string:LOCATION_REASON",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
+      },
+      {
         "name": "ohos.permission.LOCATION",
         "reason": "$string:LOCATION_REASON",
         "usedScene": {
