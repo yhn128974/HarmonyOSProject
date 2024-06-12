@@ -6,6 +6,8 @@ import { promptAction, router } from '@kit.ArkUI'
 import AvSessionManager from './AvSessionManager'
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit'
 import { wantAgent } from '@kit.AbilityKit'
+import FormIdManager from './FormIdManager'
+import { formBindingData, formProvider } from '@kit.FormKit'
 
 export class AvPlayerManager {
   static player: media.AVPlayer | null = null //播放器的实例对象
@@ -112,6 +114,14 @@ export class AvPlayerManager {
 
     // 播放器初始化地址
     AvPlayerManager.player!.url = AvPlayerManager.currentSong.url
+
+    //获取卡牌id列表
+    const formList = FormIdManager.getFormIdList()
+    formList.forEach(formID => {
+      formProvider.updateForm(formID, formBindingData.createFormBindingData({
+        song: AvPlayerManager.currentSong
+      }))
+    })
   }
 
   //   播放暂停
