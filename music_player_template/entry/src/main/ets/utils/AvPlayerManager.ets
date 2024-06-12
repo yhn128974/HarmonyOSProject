@@ -37,7 +37,7 @@ export class AvPlayerManager {
     AvPlayerManager.player.on("durationUpdate", (duration) => {
       AvPlayerManager.currentSong.duration = duration
       AppStorage.setOrCreate<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong)
-      //
+      //歌曲发生变化时给播控中心赋值
       AvSessionManager.setAvMetaData(AvPlayerManager.currentSong.playList[AvPlayerManager.currentSong.playIndex])
 
     })
@@ -45,7 +45,9 @@ export class AvPlayerManager {
     // 记录播放当前的时间
     AvPlayerManager.player.on("timeUpdate", (time) => {
       AvPlayerManager.currentSong.time = time
-      AppStorage.setOrCreate<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong)
+      AppStorage.setOrCreate<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong) //将状态分享到全局
+      AvSessionManager.setAVPlayBackState() //同步状态
+
     })
 
     AvPlayerManager.player.on("error", (error) => {
@@ -92,6 +94,7 @@ export class AvPlayerManager {
     }
     // 全局对象存贮
     AppStorage.setOrCreate<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong)
+    AvSessionManager.setAVPlayBackState() //
   }
 
   // 改变播放曲目
@@ -118,6 +121,7 @@ export class AvPlayerManager {
     AvPlayerManager.currentSong.isPlay = false;
 
     AppStorage.set<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong) // 更新到
+    AvSessionManager.setAVPlayBackState() //
 
   }
 
@@ -216,7 +220,6 @@ export class AvPlayerManager {
       // 错误消息
       AlertDialog.show({ message: error.message })
     }
-
 
 
   }

@@ -15,14 +15,27 @@ export default class AvSessionManager {
 
   }
 
-  // 设置媒体资源
+  // 设置媒体资源(封面信息)
   static async setAvMetaData (song: songItemType) {
+    console.log("SystemCapability.Multimedia.AVSession.Core:",canIUse('SystemCapability.Multimedia.AVSession.Core'))
     await AvSessionManager.session.setAVMetadata({
       assetId: song.id,
       title: song.name,
       artist: song.author,
       mediaImage: song.img,
       duration:  AvPlayerManager.currentSong.duration
+    })
+  }
+
+  static async setAVPlayBackState(){
+    AvSessionManager.session.setAVPlaybackState({
+      state:AvPlayerManager.currentSong.isPlay?AvSession.PlaybackState.PLAYBACK_STATE_PLAY:AvSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+      position:{
+        elapsedTime:AvPlayerManager.currentSong.time,
+        updateTime:new Date().getTime()
+      },
+      speed:1,
+      duration:AvPlayerManager.currentSong.duration
     })
   }
 }
