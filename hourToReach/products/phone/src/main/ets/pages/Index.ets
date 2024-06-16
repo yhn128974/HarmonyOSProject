@@ -60,7 +60,7 @@ struct Index {
         }.tabBar(this.getTabBar(item))
       })
     }.padding({
-      top:AppStorage.get("topHeight")
+      top:AppStorage.get("topHeight") as number
     })
   }
 }
