@@ -4,6 +4,7 @@ import { router } from '@kit.ArkUI'
 @Entry
 @Component
 struct Setting {
+
   comfirm: CustomDialogController = new CustomDialogController({
     builder: HMConfirm(
       {
@@ -31,6 +32,7 @@ struct Setting {
     autoCancel: false
 
   })
+
 
   handleLoginOut() {
     AppStorage.set(TOKEN_KEY, '')

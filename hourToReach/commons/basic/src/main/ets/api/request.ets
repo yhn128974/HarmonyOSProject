@@ -7,19 +7,28 @@ import { JSON } from '@kit.ArkTS';
 
 const httpRequest = http.createHttp()
 
-async function requestHttp<T>(url: string = "", method: http.RequestMethod = http.RequestMethod.GET, data?: object): Promise<T> {
+async function requestHttp<T>(url: string = "", method: http.RequestMethod = http.RequestMethod.GET,
+  data?: object): Promise<T> {
+  // 定义URL
   let urlStr = BASE_URL + url;
   // 如果是get请求手动拼装请求地址格式
   if (method === http.RequestMethod.GET) {
+
     // data参数都拼接到地址上  ?a=1&b=2&c=3
     if (data && Object.keys(data).length) {
+      // 改造url
       urlStr += "?" + Object.keys(data).filter(key =>!!data[key]).map(key => {
         return `${key}=${data[key]}`
       }).join("&")
     }
+
   }
+
   try {
-    let res = await httpRequest.request(urlStr, {
+    let res = await httpRequest.request(
+      urlStr,
+      {
+      //  data参数
       extraData: method !== http.RequestMethod.GET ? data : "", // 当请求类型不等于get时 复制
       header: {
         "Content-Type": "application/json",
@@ -28,6 +37,7 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
       method,
       readTimeout: 10000 // 如果多少秒没响应就断开
     })
+
     if (res.responseCode == 401) {
       //   401token失效
       //   移动端产品去做无感刷新
@@ -38,15 +48,15 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
       TokenStore.setToken("") //清空token
       AppStorage.set(TOKEN_KEY, "") //清空token
       return Promise.reject(new Error('登陆失效'))
-    }
-    else if (res.responseCode == 404) {
+    } else if (res.responseCode == 404) {
       promptAction.showToast({
         message: '请求地址错误'
       })
       return Promise.reject(new Error('请求地址错误'))
-    }
-    else {
+    } else {
+      //ResponseData<T> ={ code:"",data:T,msg:"}
       const data = JSON.parse((res.result) as string) as ResponseData<T>
+
       if (data.code === 200) {
 
         if (data.data) {
@@ -54,6 +64,7 @@ async function requestHttp<T>(url: string = "", method: http.RequestMethod = htt
         } else {
           return Promise.resolve(null as T)
         }
+
       } else {
         promptAction.showToast({
           message: data.msg

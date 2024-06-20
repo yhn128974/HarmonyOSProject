@@ -29,6 +29,8 @@ struct Login {
     // })
     await TokenStore.setToken(result)
     await AppStorage.setOrCreate(TOKEN_KEY, result)
+    1
+
     this.loading = false
     router.replaceUrl({
       url: "pages/Index"

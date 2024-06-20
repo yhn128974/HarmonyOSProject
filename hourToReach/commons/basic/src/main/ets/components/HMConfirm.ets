@@ -12,8 +12,10 @@ export class HmConfirmModel {
 export struct HMConfirm {
 
   controller: CustomDialogController
+
   @Prop
   message: string = "确定要退出登录吗？"
+
   @Prop buttonList: HmConfirmModel[] = [{
     text: '确定',
     fontSize: 14,

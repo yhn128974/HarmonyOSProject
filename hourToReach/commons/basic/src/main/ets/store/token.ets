@@ -16,6 +16,6 @@ export class TokenStore {
   static async setToken(token: string) {
     let store = await TokenStore.getStore()
     store.putSync(TOKEN_KEY, token)
-    store.flush()
+    await store.flush()
   }
 }

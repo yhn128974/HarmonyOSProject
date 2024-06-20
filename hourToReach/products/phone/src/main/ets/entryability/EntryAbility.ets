@@ -38,6 +38,7 @@ export default class EntryAbility extends UIAbility {
     this.myWindowStage = windowStage
     //
     let AdvertStore = new Advert(this.context, USER_SETTING)
+
     let resDefaultAdvert = await new Promise<AdvertClass>((resolve, reject) => {
       setTimeout(() => {
         resolve(defaultAdvert)
@@ -54,7 +55,9 @@ export default class EntryAbility extends UIAbility {
 
     TokenStore.context = this.context
     let token = await TokenStore.getToken()
+
     await AppStorage.setOrCreate(TOKEN_KEY, token)
+
     if (token) {
       // Main window is created, set main page for this ability
       windowStage.loadContent('pages/Index', (err) => {

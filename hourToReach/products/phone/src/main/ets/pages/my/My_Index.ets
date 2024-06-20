@@ -178,7 +178,7 @@ export default struct My_index {
           }
         }
 
-      }.width('100%').height('100%').backgroundColor($r('app.color.background_page')).borderRadius(8)
+      }.width('100%').height('100%').borderRadius(8)
 
     } else {
       HmSkeleton()

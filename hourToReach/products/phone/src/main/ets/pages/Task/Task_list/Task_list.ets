@@ -43,9 +43,8 @@ export struct Task_list {
       endTime: this.currentTaskListParams.endTime || "",
       transportTaskId:this.currentTaskListParams.transportTaskId||""
     } as TaskListParams)
+
     this.currentTaskListParams = firstTaskListParams
-
-
     this.loading.open()
     const res = await getTaskList(this.currentTaskListParams)
     this.currentTaskListData = res
@@ -59,6 +58,7 @@ export struct Task_list {
       page: this.currentTaskListParams.page + 1,
       pageSize: 5,
     } as TaskListParams)
+
     const res = await getTaskList(this.currentTaskListParams)
     this.currentTaskListData = res
     let newCurrentTaskInfoItems: TaskInfoItemModel[] = res.items as TaskInfoItemModel[]

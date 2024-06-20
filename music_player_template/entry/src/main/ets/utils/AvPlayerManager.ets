@@ -13,8 +13,10 @@ import SongManager from './SongManager'
 import AvSessionManager from './AvSessionManager'
 
 export class AvPlayerManager {
+
   static player: media.AVPlayer | null = null // 播放器对象
   static currentSong: PlayStateType = new PlayStateType() // 记录当前的歌曲
+
   // 初始化播放器
   static async init() {
     // 保证当前只有一个播放器 不重复创建不浪费资源
@@ -27,26 +29,27 @@ export class AvPlayerManager {
           AvPlayerManager.player?.prepare() // 准备
           break;
         case "prepared":
-          if(AppStorage.get("firstplay") === 1) {
+          if (AppStorage.get("firstplay") === 1) {
             // 说明上次的直接来播放了// 只会进来一次
             AppStorage.setOrCreate("firstplay", 0)
-          }else {
+          } else {
             AvPlayerManager.currentSong.isPlay = true // 表示正在播放
             AvPlayerManager.player?.play() // 播放
           }
-
           break;
         case "completed":
           AvPlayerManager.nextPlay(AvPlayerManager.currentSong.playMode === "repeat") // 直接调用下一首播放
           break
       }
     })
+
     // 播放器可以监听播放时长的变化
     AvPlayerManager.player.on("durationUpdate", (duration) => {
       AvPlayerManager.currentSong.duration = duration // 记录当前歌曲的时长
       AppStorage.setOrCreate<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong) // 将状态设置到全局
       AvSessionManager.setAvMetaData(AvPlayerManager.currentSong.playList[AvPlayerManager.currentSong.playIndex])
     })
+
     // 需要知道歌曲播到哪里了
     AvPlayerManager.player.on("timeUpdate", (time) => {
       AvPlayerManager.currentSong.time = time
@@ -104,18 +107,19 @@ export class AvPlayerManager {
     SongManager.updateSong(JSON.stringify(AvPlayerManager.currentSong))
 
   }
+
   // 推送图片
-  static  pushImage () {
-    ImageSave.saveFile(AvPlayerManager.currentSong.name+".jpg", AvPlayerManager.currentSong.img, (filePath) => {
+  static pushImage() {
+    ImageSave.saveFile(AvPlayerManager.currentSong.name + ".jpg", AvPlayerManager.currentSong.img, (filePath) => {
       // filePath就是文件的路径
       // 下载成功  并不是每次都下载
-      const formIdList =  FormIdManager.getFormIdList()
+      const formIdList = FormIdManager.getFormIdList()
       let fileInfo: Record<string, number> = {} // 定义健值对类型
       fileInfo[filePath] = fileIo.openSync(filePath).fd // { key(沙箱路径): 沙箱文件对应的fd的值  }
       formIdList.forEach(formId => {
         formProvider.updateForm(formId, formBindingData.createFormBindingData({
           song: AvPlayerManager.currentSong,
-          formImages: fileInfo,  // 这个是必须要写的
+          formImages: fileInfo, // 这个是必须要写的
           fileName: filePath // 传递需要的路径
           // 需要把filePath给到卡片
           // formImages: { key(沙箱路径): 沙箱文件对应的fd的值  }
@@ -124,10 +128,12 @@ export class AvPlayerManager {
     })
 
   }
+
   // 暂停
   static pause() {
     AvPlayerManager.player?.pause() // 播放器暂停
     AvPlayerManager.currentSong.isPlay = false // 状态更新
+
     AppStorage.setOrCreate<PlayStateType>(SONG_KEY, AvPlayerManager.currentSong) // 将状态设置到全局
     AvSessionManager.setAVPlayBackState() // 设置状态
   }
@@ -222,16 +228,17 @@ export class AvPlayerManager {
         requestCode: 0,
         wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
       }
-      const want = await wantAgent.getWantAgent(wantAgentInfo) // 申请want信息
 
+      const want = await wantAgent.getWantAgent(wantAgentInfo) // 申请want信息
       // 申请长时任务
       await backgroundTaskManager.startBackgroundRunning(getContext(),
         backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK,
         want
       )
-    }catch (error) {
+    } catch (error) {
       AlertDialog.show({ message: error.message })
     }
 
   }
+
 }
