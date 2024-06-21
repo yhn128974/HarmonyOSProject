@@ -6,7 +6,6 @@
   "author": "",
   "license": "",
   "dependencies": {
-
     "basic": "file:../../commons/basic",
   },
   "devDependencies": {},

@@ -1,5 +1,6 @@
 import { HmLoading, HmNavBar, HmSkeleton, HmToggleCard, HmUpload, ImageUrl, UploadFile } from 'basic'
 import { componentSnapshot, promptAction, router } from '@kit.ArkUI'
+
 import {
   CommonRouterParams,
   TaskDetailInfo,
@@ -34,6 +35,7 @@ class PostParams {
 @Component
 struct TaskDetail {
   scroller: Scroller = new Scroller()
+
   @State currentTaskDetailInfo: TaskDetailInfoModel = new TaskDetailInfoModel({} as TaskDetailInfo)
   // 定义一个弹出层控制器
   loadingDialog: CustomDialogController = new CustomDialogController({
@@ -500,6 +502,7 @@ struct TaskDetail {
               }
             })
           })
+
         Button("交货", { type: ButtonType.Capsule })
           .backgroundColor($r('app.color.primary'))
           .fontColor($r('app.color.white'))
@@ -510,6 +513,7 @@ struct TaskDetail {
           .onClick(() => {
             this.handleDeliver()
           })
+
       }
       .width('100%')
       .padding({ left: 15, right: 15 })

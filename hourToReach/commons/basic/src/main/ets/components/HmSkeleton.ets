@@ -54,7 +54,6 @@ export struct HmSkeleton {
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-
       }
       .alignItems(VerticalAlign.Top)
       .width('100%')

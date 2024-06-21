@@ -41,7 +41,7 @@ export struct Task_list {
       pageSize: 5,
       startTime: this.currentTaskListParams.startTime || "",
       endTime: this.currentTaskListParams.endTime || "",
-      transportTaskId:this.currentTaskListParams.transportTaskId||""
+      transportTaskId: this.currentTaskListParams.transportTaskId || ""
     } as TaskListParams)
 
     this.currentTaskListParams = firstTaskListParams
@@ -52,7 +52,7 @@ export struct Task_list {
     this.loading.close()
   }
 
-  async getMoreListDate() {
+  getMoreListDate = async (): Promise<void> => {
     this.currentTaskListParams = new TaskListParamsModel({
       status: this.currentTaskType,
       page: this.currentTaskListParams.page + 1,
@@ -110,7 +110,8 @@ export struct Task_list {
               selected: new Date(),
               onDateAccept: ((value) => {
 
-                this.currentTaskListParams.startTime = `${value.getFullYear()}-${this.addZero(value.getMonth()! + 1)}-${this.addZero(value.getDate())}`
+                this.currentTaskListParams.startTime =
+                  `${value.getFullYear()}-${this.addZero(value.getMonth()! + 1)}-${this.addZero(value.getDate())}`
               })
             })
           })
@@ -127,7 +128,8 @@ export struct Task_list {
             DatePickerDialog.show({
               selected: new Date(),
               onDateAccept: ((value: Date) => {
-                this.currentTaskListParams.endTime = `${value.getFullYear()}-${this.addZero(value.getMonth()! + 1)}-${this.addZero(value.getDate())}`
+                this.currentTaskListParams.endTime =
+                  `${value.getFullYear()}-${this.addZero(value.getMonth()! + 1)}-${this.addZero(value.getDate())}`
               })
             })
           })
@@ -166,14 +168,16 @@ export struct Task_list {
       }
 
       HMList({
+
         objectList: this.currentTaskInfoItems,
         upDate: async () => {
           await this.handleTaskListData()
+
           promptAction.showToast({
             message: '数据更新完毕'
           })
         },
-        getMoreDate: async () => {
+        getMoreDate: () => {
           this.getMoreListDate()
         },
         ListBuilder: (item) => {

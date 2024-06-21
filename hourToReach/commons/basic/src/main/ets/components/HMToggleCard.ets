@@ -16,6 +16,7 @@ export struct HmToggleCard {
             .fontSize(16)
             .fontColor($r("app.color.text_primary"))
             .fontWeight(500)
+
           Image(this.toggleCard ? $r("app.media.ic_btn_cut") : $r("app.media.ic_btn_add"))
             .width(24)
             .aspectRatio(1)
