@@ -1,6 +1,7 @@
 @Component
 export struct HMList {
   @State refreshing: boolean = false
+
   @Prop objectList: object[] = []
 
   upDate: () => void = () => {
@@ -10,6 +11,7 @@ export struct HMList {
   }
 
   @BuilderParam ListBuilder: (item: object) => void
+
   @Prop finished: boolean = false
   @State loading: boolean = false //显示加载中的文本,并且用来做阀门
   @Prop
@@ -84,13 +86,12 @@ export struct HMList {
         }
       })
     }.onStateChange((state: RefreshStatus) => {
-
+      // 保存当前RefreshStatus
       this.currentRefreshStatus = state
       //上拉刷新
       if (state === RefreshStatus.Refresh) {
         this.upDate()
       }
     })
-
   }
 }

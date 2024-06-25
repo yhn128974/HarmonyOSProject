@@ -24,9 +24,7 @@ struct Start {
     })
 
     const AdvertStore: Advert = new Advert(getContext(this), USER_SETTING)
-
     this.myAdvert = await AdvertStore.getUserAdvert(USER_SETTING_AD)
-
 
     this.timer = setInterval(() => {
       if (this.myAdvert.adTime === 0) {

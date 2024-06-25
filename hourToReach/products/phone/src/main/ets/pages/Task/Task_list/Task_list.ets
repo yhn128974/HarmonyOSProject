@@ -15,6 +15,7 @@ import { promptAction } from '@kit.ArkUI'
 @Preview
 @Component
 export struct Task_list {
+
   @State reset: boolean = false
   loading: CustomDialogController = new CustomDialogController({
     builder: HmLoading(),
@@ -34,7 +35,6 @@ export struct Task_list {
   }
 
   async handleTaskListData() {
-
     let firstTaskListParams: TaskListParamsModel = new TaskListParamsModel({
       status: this.currentTaskType,
       page: 1,
@@ -44,7 +44,10 @@ export struct Task_list {
       transportTaskId: this.currentTaskListParams.transportTaskId || ""
     } as TaskListParams)
 
+    // 给参数赋初始值
     this.currentTaskListParams = firstTaskListParams
+
+    // 加载数据
     this.loading.open()
     const res = await getTaskList(this.currentTaskListParams)
     this.currentTaskListData = res
@@ -52,13 +55,13 @@ export struct Task_list {
     this.loading.close()
   }
 
+  // 下拉加载更多数据
   getMoreListDate = async (): Promise<void> => {
     this.currentTaskListParams = new TaskListParamsModel({
       status: this.currentTaskType,
       page: this.currentTaskListParams.page + 1,
       pageSize: 5,
     } as TaskListParams)
-
     const res = await getTaskList(this.currentTaskListParams)
     this.currentTaskListData = res
     let newCurrentTaskInfoItems: TaskInfoItemModel[] = res.items as TaskInfoItemModel[]
@@ -162,24 +165,23 @@ export struct Task_list {
 
   build() {
     Column() {
-
       if (this.currentTaskType === TaskTypeEnum.Finish) {
         this.getSearchForm()
       }
-
       HMList({
-
         objectList: this.currentTaskInfoItems,
+        // 更新数据
         upDate: async () => {
           await this.handleTaskListData()
-
           promptAction.showToast({
             message: '数据更新完毕'
           })
         },
+        // 加载更多数据
         getMoreDate: () => {
           this.getMoreListDate()
         },
+        // 列表样式
         ListBuilder: (item) => {
           this.TaskItemCardBuilder(item as TaskInfoItemModel)
         },
@@ -187,9 +189,6 @@ export struct Task_list {
         loadingFinishedText: "数据全部加载完毕",
         finished: !!(this.currentTaskListData.page == this.currentTaskListData.pages)
       }).height('100%')
-
-
     }
-
   }
 }

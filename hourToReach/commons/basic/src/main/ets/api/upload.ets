@@ -20,6 +20,7 @@ export const uploadImageUrl = async (context: Context, files: request.File[]) =>
     files,
     data: [] // 批量上传需要携带的参数 用不上
   }
+
   return new Promise<ImageUrl[]>(async (resolve, reject) => {
     try {
       let arr: ImageUrl[] = []
@@ -31,6 +32,7 @@ export const uploadImageUrl = async (context: Context, files: request.File[]) =>
         })
         reject(new Error("上传失败"))
       })
+
       // 每上传成功一次就会进来
       task.on("headerReceive", (headers: object) => {
         if (headers["body"]) {
@@ -42,6 +44,7 @@ export const uploadImageUrl = async (context: Context, files: request.File[]) =>
           }
         }
       })
+
       task.on("complete", () => {
         // 上传完成
         // 也不能拿到上传成功的地址

@@ -615,7 +615,6 @@ struct TaskDetail {
               // 显示截图弹窗
               this.showSnap = true
 
-
               // 只能在原生组件上使用
               const myColumn = getInspectorByKey('detailPage')
 

@@ -3,7 +3,6 @@ import { ImageUrl } from '../models'
 import { HmPreview } from './HMPreview'
 import { JSON, util } from '@kit.ArkTS'
 import { request } from '@kit.BasicServicesKit'
-
 import { uploadImageUrl } from '../api'
 
 @Component
@@ -28,18 +27,15 @@ export struct HmUpload {
 
   async selectImg() {
     const photo = new picker.PhotoViewPicker() //图片选择对象
-
     const result = await photo.select({
       MIMEType: picker.PhotoViewMIMETypes.IMAGE_TYPE,
       maxSelectNumber: this.maxNumber - this.currentImageList.length
     })
-
     if (result.photoUris.length > 0) {
       let newImageList = result.photoUris.map(item => ({ url: item }) as ImageUrl)
       this.currentImageList.push(...newImageList)
       this.handleCurrentImageListChange(this.currentImageList)
     }
-
   }
 
   build() {
@@ -52,7 +48,6 @@ export struct HmUpload {
       //图片展示
       Grid() {
         ForEach(this.currentImageList, (item: ImageUrl, index: number) => {
-
           GridItem() {
             Stack({ alignContent: Alignment.TopEnd }) {
               Image(item.url).width(100).aspectRatio(1).borderRadius(4).onClick(() => {
@@ -66,7 +61,6 @@ export struct HmUpload {
                     this.handleCurrentImageListChange(this.currentImageList)
                   })
               }
-
             }
           }
         })
@@ -94,14 +88,12 @@ export struct HmUpload {
       .rowsGap(10)
       .width('100%')
       .height(Math.ceil(this.maxNumber / 3) * 110)
-
     }.alignItems(HorizontalAlign.Start).width('100%')
   }
 }
 
 
 export async function UploadFile(list: ImageUrl[]) {
-
   let saveDir = getContext().cacheDir //存储的目录
   //要提交的参数
   const fileParams: request.File[] = []
