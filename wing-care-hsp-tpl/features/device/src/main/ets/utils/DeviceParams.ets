@@ -17,7 +17,7 @@ class DeviceParamsStore {
   getParams() {
     return this.data
   }
-
+  
   //   设置参数
   setParams(iotId?: string, nodeId?: string,) {
     this.data.iotId = iotId

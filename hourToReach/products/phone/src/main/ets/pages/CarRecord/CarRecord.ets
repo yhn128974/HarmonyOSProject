@@ -1,5 +1,6 @@
-import { HMCard, HMCard_item, HmNavBar, HmCheckBox,transTimeFormat } from 'basic';
+import { HMCard, HMCard_item, HmNavBar, HmCheckBox, transTimeFormat } from 'basic';
 import { promptAction, router } from '@kit.ArkUI';
+import dayjs from 'dayjs'
 import {
   CarRecordType,
   CarRecordTypeModel,
@@ -27,14 +28,7 @@ struct CarReCord {
     this.currentTaskDetailInfo = await getTaskDetail(id)
   }
 
-  // 日期转化格式
-  // transTimeFormat(value: Date) {
-  //   // 2023-12-23 05:12
-  //   return value.getFullYear() + "-" + (value.getMonth() + 1).toString().padStart(2, "0") + '-'
-  //     + value.getDate().toString().padStart(2, "0") + " " +
-  //   value.getHours().toString().padStart(2, "0") + ":"
-  //     + value.getMinutes().toString().padStart(2, "0")
-  // }
+
 
   //检测再提交
   async handleCarRecord() {
@@ -80,7 +74,11 @@ struct CarReCord {
                 showTime: true,
                 useMilitaryTime: true,
                 onDateAccept: (value: Date) => {
-                  this.currentCarRecord.endTime = transTimeFormat(value)
+                  let str = dayjs(value).format('YYYY-MM-DD HH-mm')
+                  promptAction.showToast({
+                    message:str
+                  })
+                  // this.currentCarRecord.endTime = transTimeFormat(value)
 
                 }
               })

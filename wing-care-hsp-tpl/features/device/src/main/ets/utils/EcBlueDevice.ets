@@ -34,6 +34,7 @@ export class EcBlueDevice {
       clearTimeout(EcBlueDevice.timer)
     } else {
       let list: ble.ScanResult[] = []
+
       // 1. 监听扫描结果
       ble.on("BLEDeviceFind", (devices: ble.ScanResult[]) => {
         // 打印扫到设备

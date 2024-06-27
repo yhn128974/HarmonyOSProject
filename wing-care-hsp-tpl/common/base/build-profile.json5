@@ -12,7 +12,10 @@
             "files": [
               "./obfuscation-rules.txt"
             ]
-          }
+          },
+          "consumerFiles": [
+            "./consumer-rules.txt"
+          ]
         }
       },
     },
@@ -20,6 +23,9 @@
   "targets": [
     {
       "name": "default"
+    },
+    {
+      "name": "ohosTest"
     }
   ]
 }

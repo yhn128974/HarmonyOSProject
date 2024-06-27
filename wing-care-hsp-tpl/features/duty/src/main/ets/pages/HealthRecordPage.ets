@@ -1,5 +1,5 @@
 import { router } from '@kit.ArkUI';
-import { ResManager } from '@hm/basic/Index';
+import { ResManager } from '@hm/base/Index'
 
 @Entry
 @Component
@@ -49,7 +49,7 @@ struct HealthRecordPage {
               Text('2024-03')
                 .fontSize(13)
                 .fontColor($r('app.color.ec_mid_19'))
-              Image($r('app.media.ic_down'))
+              Image($r('app.media.ic_time_down'))
                 .width(12)
                 .height(5)
                 .margin({ left: 2 })

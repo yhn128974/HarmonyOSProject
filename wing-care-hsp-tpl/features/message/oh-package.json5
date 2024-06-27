@@ -7,6 +7,6 @@
   "license": "Apache-2.0",
   "packageType": "InterfaceHar",
   "dependencies": {
-    "@hm/basic": "file:../../common/basic"
+    "@hm/basic": "file:../../common/base"
   }
 }

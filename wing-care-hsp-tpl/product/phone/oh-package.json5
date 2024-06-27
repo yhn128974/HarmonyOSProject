@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@hm/basic": "file:../../common/basic",
+    "@hm/basic": "file:../../common/base",
     "@ec/home": "file:../../features/home",
     "@ec/duty": "file:../../features/duty",
     "@ec/stage": "file:../../features/stage",

@@ -1,5 +1,5 @@
 import { EcList } from '@itheima/wing-care'
-import { ResManager } from '@hm/basic/Index'
+import { ResManager } from '@hm/base/Index'
 
 
 class Params {

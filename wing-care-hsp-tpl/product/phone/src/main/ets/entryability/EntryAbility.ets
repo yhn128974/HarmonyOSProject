@@ -1,5 +1,4 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { Log } from '@abner/log'
 import dayjs from 'dayjs';
@@ -41,7 +40,7 @@ export default class EntryAbility extends UIAbility {
     //   FirstUrl = RouterConfig.LOGIN_URL
     // }
 
-    windowStage.loadContent(RouterConfig.DEVICE_DOOR_BLUE_OPEN_URL, (err, data) => {
+    windowStage.loadContent('pages/Index', (err, data) => {
       if (err.code) {
         Log.error('Failed to load the content. Cause: %{public}s' + JSON.stringify(err) ?? '');
         return;

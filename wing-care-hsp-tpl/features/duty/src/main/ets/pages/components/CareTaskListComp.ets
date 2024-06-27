@@ -1,6 +1,6 @@
 import { EcList, EcDialogTips } from '@itheima/wing-care'
 import router from '@ohos.router'
-import { ResManager } from '@hm/basic/Index'
+import { ResManager } from '@hm/base/Index'
 
 class Params {
   page: number = 1

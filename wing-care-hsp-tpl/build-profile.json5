@@ -19,7 +19,6 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compileSdkVersion": "4.1.0(11)",
         "compatibleSdkVersion": "4.1.0(11)",
         "runtimeOS": "HarmonyOS",
       }
@@ -37,18 +36,6 @@
     {
       "name": "phone",
       "srcPath": "./product/phone",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "basic",
-      "srcPath": "./common/basic",
       "targets": [
         {
           "name": "default",
@@ -129,6 +116,10 @@
           ]
         }
       ]
+    },
+    {
+      "name": "base",
+      "srcPath": "./common/base",
     }
   ]
 }

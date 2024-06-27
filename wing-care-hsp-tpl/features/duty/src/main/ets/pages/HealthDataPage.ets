@@ -1,4 +1,4 @@
-import { ResManager } from '@hm/basic/Index'
+import { ResManager } from '@hm/base/Index'
 import router from '@ohos.router'
 import dayjs from 'dayjs'
 

@@ -1,4 +1,4 @@
-import { ResManager } from '@hm/basic/Index'
+import { ResManager } from '@hm/base/Index'
 import router from '@ohos.router'
 import { HealthChartComp } from './components/HealthChartComp'
 import { HealthAlarmComp } from './components/HealthAlarmComp'
