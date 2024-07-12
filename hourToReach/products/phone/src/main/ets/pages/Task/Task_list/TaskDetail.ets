@@ -42,7 +42,11 @@ struct TaskDetail {
     builder: HmLoading(),
     customStyle: true
   })
+
+  // 截图状态
   @State snapImage: image.PixelMap | null = null;
+
+  //
   @State showSnap: boolean = false
 
   // @State currentExceptionList: ExceptionListModel = new ExceptionListModel({} as ExceptionList)
@@ -71,7 +75,6 @@ struct TaskDetail {
   async handleTaskDetailInfo(id: string) {
 
     this.currentTaskDetailInfo = await getTaskDetail(id)
-
   }
 
   // 获取提货的状态
@@ -91,6 +94,7 @@ struct TaskDetail {
   async handlePickUp() {
     this.loadingDialog.open()
 
+    // 根据work路径生成worker
     const ImageCompressWorker1 = new worker.ThreadWorker("phone/ets/workers/uploadWorker.ets")
     const ImageCompressWorker2 = new worker.ThreadWorker("phone/ets/workers/uploadWorker.ets")
 
@@ -121,6 +125,7 @@ struct TaskDetail {
       checkFile()
     })
 
+    // 检测压缩文件是否存在
     const checkFile = async () => {
       if (!!(pressedCargoPickUpPictureList.length && pressedCargoPictureList.length)) {
         // 上传并获取本地file中的图片
@@ -247,8 +252,8 @@ struct TaskDetail {
       const thisContext = getContext() as common.UIAbilityContext
 
       thisContext.startAbility({
-        action: 'ohos.want.action.viewData', //拉起浏览器应用
-        entities: ['entity.system.browsable'],
+        action: 'ohos.want.action.viewData',
+        entities: ['entity.system.browsable'],//拉起浏览器应用app
         uri: encodeURI('https://gaode.com/search?query=' + this.currentTaskDetailInfo.endAddress)
       })
     } catch (error) {
@@ -301,6 +306,7 @@ struct TaskDetail {
         right: 20
       })
 
+      // 在途状态
       if (this.currentTaskDetailInfo.status === TaskTypeEnum.Line) {
         Column() {
           Image($r("app.media.ic_navigation")).width(22).height(22)

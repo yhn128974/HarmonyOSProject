@@ -22,7 +22,7 @@ struct Index {
           TextArea({ placeholder: 'Please enter tts original text', text: `${this.originalText}` })
             .margin(20)
             .focusable(false)
-            .border({ width: 5, color: 0x317AE7, radius: 10, style: BorderStyle.Dotted })
+            .border({  width: 5, color: 0x317AE7, radius: 10, style: BorderStyle.Dotted })
             .onChange((value: string) => {
               this.originalText = value;
               console.info("original text: " + this.originalText);

@@ -24,8 +24,10 @@ export class Advert {
 
   //设置用户的广告配置
   async setUserAdvert(key: string, value: AdvertClass) {
+
     let store = this.getStore()
     store.putSync(key, JSON.stringify(value))
+
     await store.flush(() => {
       promptAction.showToast({
         message: `Advert was accomplishded,key:${key}  `
@@ -40,10 +42,13 @@ export class Advert {
 
   getAllUserAdvert() {
     let store = this.getStore()
+
     let UserAdvertsObject = store.getAllSync() as object
+
     if (UserAdvertsObject) {
       let UserAdvertsList: AdvertClass[] = Object.values(UserAdvertsObject)
         .map((item: string) => JSON.parse(item) as AdvertClass)
+
       return UserAdvertsList
     } else {
       return []

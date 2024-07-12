@@ -4,8 +4,6 @@ import wifiManager from '@ohos.wifiManager';
 export type WifiListCb = (list: wifiManager.WifiScanInfo[]) => void
 
 class EcWifi {
-
-
   /**
    * 检测 wifi 是否开启
    * @returns
@@ -20,9 +18,7 @@ class EcWifi {
   }
 
   scanWifi(cb: WifiListCb) {
-
     console.log("wifiManager.getScanInfoList" + canIUse('SystemCapability.Communication.WiFi.STA'))
-
     try {
       let scanInfoList = wifiManager.getScanInfoList();
       Log.info("scanInfoList:" + JSON.stringify(scanInfoList));

@@ -103,12 +103,14 @@ export async function UploadFile(list: ImageUrl[]) {
     //   相册地址
     const uniqueName = util.generateRandomUUID() + '.jpg'
     fileIo.copyFileSync(file.fd, saveDir + "/" + uniqueName)
+
     fileParams.push({
       filename: uniqueName,
       name: 'file', //接口参数名称
       type: 'jpg', //文件类型后缀
       uri: `internal://cache/${uniqueName}` //应该是文件放在cache目录下,如果是cache协议 它会自动找到这个文件
     })
+
     fileIo.closeSync(file.fd)
   })
   // 返回本地文件

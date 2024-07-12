@@ -47,7 +47,6 @@ export default class EntryAbility extends UIAbility {
 
     await AdvertStore.setUserAdvert(USER_SETTING_AD, resDefaultAdvert)
     let myAdvert: AdvertClass = await AdvertStore.getUserAdvert(USER_SETTING_AD) as AdvertClass
-
     if (myAdvert.showAd) {
       const advertWindow = await windowStage.createSubWindow('ad_window') //创建一个子窗口
       await advertWindow.showWindow()
@@ -56,7 +55,6 @@ export default class EntryAbility extends UIAbility {
 
     TokenStore.context = this.context
     let token = await TokenStore.getToken()
-
     await AppStorage.setOrCreate(TOKEN_KEY, token)
 
     if (token) {

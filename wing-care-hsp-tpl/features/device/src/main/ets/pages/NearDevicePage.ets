@@ -12,6 +12,7 @@ struct NearDevicePage {
   @StorageProp('topHeight')
   topHeight: number = 0
   // 1. 搜索动画
+
   // 旋转角度
   @State angle: number = 0
   step: number = 5
@@ -23,6 +24,7 @@ struct NearDevicePage {
   @State
   hasDevice: boolean = false
   @State list: ble.ScanResult[] = []
+
   notFoundDialog: CustomDialogController = new CustomDialogController({
     builder: EcDialogTips({
       title: '未查找到设备',
@@ -45,11 +47,9 @@ struct NearDevicePage {
   @State isConnect: boolean = false;
 
   aboutToAppear(): void {
-
     try {
       // 模拟器不能扫描蓝牙
       this.search()
-
     } catch (error) {
       Log.info(error)
     }
@@ -58,35 +58,34 @@ struct NearDevicePage {
   connect(id: string) {
     this.isConnect = true
     // 链接开门设备
-    // EcBlueDevice.connectDoorDevice(id, async () => {
-    //   promptAction.showToast({
-    //     message: '连接成功'
-    //   })
-    //   try {
-    //     // 1. 连接成功绑定设备api
-    //     await bindDeviceApi(deviceParamsStore.getParams().iotId!)
-    //
-    //     // 2. 跳转提示页面
-    //     router.pushUrl({
-    //       url: RouterConfig.DEVICE_BIND_TIP_URL,
-    //       params: {
-    //         tips: 1
-    //       }
-    //     })
-    //
-    //   } catch (e) {
-    //     router.pushUrl({
-    //       url: RouterConfig.DEVICE_BIND_TIP_URL,
-    //       params: {
-    //         tips: 2
-    //       }
-    //     })
-    //   }
-    // })
+    EcBlueDevice.connectDoorDevice(id, async () => {
+      promptAction.showToast({
+        message: '连接成功'
+      })
+      try {
+        // 1. 连接成功绑定设备api
+        await bindDeviceApi(deviceParamsStore.getParams().iotId!)
+
+        // 2. 跳转提示页面
+        router.pushUrl({
+          url: RouterConfig.DEVICE_BIND_TIP_URL,
+          params: {
+            tips: 1
+          }
+        })
+
+      } catch (e) {
+        router.pushUrl({
+          url: RouterConfig.DEVICE_BIND_TIP_URL,
+          params: {
+            tips: 2
+          }
+        })
+      }
+    })
 
     //   假设未连接
     router.pushUrl({
-
       url: RouterConfig.DEVICE_BIND_TIP_URL,
       params: {
         tips: 1
@@ -110,6 +109,7 @@ struct NearDevicePage {
   search() {
     this.run()
     this.list = []
+
     // 开始扫描
     // EcBlueDevice.scanDevice({ type: "mac", value: '10-8A-9B-8F-EC-3C' }, (list: ble.ScanResult[]) => {
     //   this.isSearch = false
@@ -118,7 +118,6 @@ struct NearDevicePage {
     //   if (list.length > 0) {
     //     this.hasDevice = true
     //     this.list = list
-    //
     //   } else {
     //     this.hasDevice = false
     //   }
@@ -230,8 +229,7 @@ struct NearDevicePage {
         .width('100%')
         .height('100%')
         .backgroundColor('#fff')
-      }
-      else {
+      } else {
         Column() {
           // 标题
           Row() {

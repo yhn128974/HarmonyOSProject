@@ -65,7 +65,6 @@ struct SelectLocation {
     })
 
     this.currentList = resNearby.sites?.slice(0, 3) as SiteClass[]
-
   }
 
   build() {
@@ -92,17 +91,19 @@ struct SelectLocation {
         Column() {
           HMCard() {
             ForEach(this.currentList, (item: SiteClass) => {
-              HMCard_item({ leftTitle: item.name, rightTitle: `${item.distance.toString()}m以内` ,handleRightClick:()=>{
-                router.back({
-                  url:"pages/ExceptionReport/ExceptionReport",
-                  params:{
-                    location:item.name,
-                  }
-                })
-              }})
+              HMCard_item({
+                leftTitle: item.name,
+                rightTitle: `${item.distance.toString()}m以内`,
+                handleRightClick: () => {
+                  router.back({
+                    url: "pages/ExceptionReport/ExceptionReport",
+                    params: {
+                      location: item.name,
+                    }
+                  })
+                }
+              })
             })
-
-
           }
         }
         .padding({

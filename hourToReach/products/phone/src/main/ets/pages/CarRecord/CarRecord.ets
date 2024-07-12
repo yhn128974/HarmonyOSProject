@@ -78,7 +78,7 @@ struct CarReCord {
                   promptAction.showToast({
                     message:str
                   })
-                  // this.currentCarRecord.endTime = transTimeFormat(value)
+                  this.currentCarRecord.endTime = str
 
                 }
               })

@@ -35,6 +35,7 @@ export struct Task_list {
   }
 
   async handleTaskListData() {
+
     let firstTaskListParams: TaskListParamsModel = new TaskListParamsModel({
       status: this.currentTaskType,
       page: 1,

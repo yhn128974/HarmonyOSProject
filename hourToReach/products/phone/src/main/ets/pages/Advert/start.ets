@@ -1,7 +1,6 @@
 import { Advert, USER_SETTING, USER_SETTING_AD, AdvertClass } from 'basic'
 import { window } from '@kit.ArkUI'
 
-
 @Entry
 @Component
 struct Start {
@@ -24,6 +23,7 @@ struct Start {
     })
 
     const AdvertStore: Advert = new Advert(getContext(this), USER_SETTING)
+
     this.myAdvert = await AdvertStore.getUserAdvert(USER_SETTING_AD)
 
     this.timer = setInterval(() => {
@@ -34,6 +34,7 @@ struct Start {
       }
       this.myAdvert.adTime--
     }, 1000)
+
   }
 
   aboutToDisappear(): void {
@@ -42,8 +43,8 @@ struct Start {
   }
 
   build() {
-    Stack({ alignContent: Alignment.TopEnd }) {
 
+    Stack({ alignContent: Alignment.TopEnd }) {
       Image(this.myAdvert?.adImg).objectFit(ImageFit.Cover)
 
       Text(`${this.myAdvert.adTime}秒后跳过`)

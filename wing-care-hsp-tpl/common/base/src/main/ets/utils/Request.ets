@@ -69,6 +69,7 @@ currentAxios.interceptors.response.use(
     // 处理401token失效
     if (error.response?.status == 401) {
       UserSore.delUser()
+      
       router.replaceUrl({
         url: RouterConfig.LOGIN_URL
       })

@@ -5,17 +5,6 @@ export interface UserInfo {
   user_id: string // 用户id
 }
 
-export class UserInfoModel implements UserInfo {
-  username: string = ''
-  avatar: string = ''
-  user_id: string = ''
-
-  constructor(model: UserInfo) {
-    this.username = model.username
-    this.avatar = model.avatar
-    this.user_id = model.user_id
-  }
-}
 
 export const DefaultUserList: UserInfo[] = [
   {
@@ -65,4 +54,15 @@ export const CurrentUser: UserInfo = {
   username: '龙犹',
   avatar: 'https://img2.baidu.com/it/u=3135824442,872902204&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
   user_id: '9999'
+}
+export class UserInfoModel implements UserInfo {
+  username: string = ''
+  avatar: string = ''
+  user_id: string = ''
+
+  constructor(model: UserInfo) {
+    this.username = model.username
+    this.avatar = model.avatar
+    this.user_id = model.user_id
+  }
 }
